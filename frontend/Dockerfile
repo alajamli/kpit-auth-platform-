@@ -22,6 +22,7 @@ RUN rm -rf /usr/share/nginx/html/*
 COPY nginx.conf /etc/nginx/templates/default.conf.template
 ENV PORT=80
 ENV BACKEND_URL=http://backend:5000
+ENV BACKEND_HOST=backend
 ENV NGINX_RESOLVER=127.0.0.11
 
 # 3. Copie des fichiers compilés par Angular

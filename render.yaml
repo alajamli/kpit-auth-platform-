@@ -1,4 +1,4 @@
-# Blueprint Render : backend Flask (Docker) + frontend Angular (site statique gratuit).
+# Blueprint Render : backend Flask (Docker) + frontend Angular + nginx (Docker).
 # Le frontend relaie /api/* vers le backend : le navigateur ne parle qu'au frontend (pas de CORS).
 services:
   - type: web
@@ -26,14 +26,16 @@ services:
 
   - type: web
     name: kpit-frontend
-    runtime: static
-    rootDir: frontend
-    buildCommand: npm ci && npm run build -- --configuration production
-    staticPublishPath: dist/frontend/browser
-    routes:
-      - type: rewrite
-        source: /api/*
-        destination: https://kpit-backend.onrender.com/api/*
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    runtime: docker
+    plan: free
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    healthCheckPath: /
+    envVars:
+      # nginx relaie /api/* vers le backend (le navigateur ne parle qu'au frontend)
+      - key: BACKEND_URL
+        value: https://kpit-backend.onrender.com
+      - key: BACKEND_HOST
+        value: kpit-backend.onrender.com
+      - key: NGINX_RESOLVER
+        value: 1.1.1.1
