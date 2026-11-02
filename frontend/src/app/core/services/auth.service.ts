@@ -155,4 +155,16 @@ export class AuthService {
       catchError(this.handleError)
     );
   }
+  loginWithGoogle(idToken: string): Observable<any> {
+  return this.http.post<any>(`${this.apiUrl}/auth/google`, { id_token: idToken }).pipe(
+    tap(response => {
+      if (response.access_token) {
+        localStorage.setItem('access_token', response.access_token);
+        localStorage.setItem('refresh_token', response.refresh_token);
+        localStorage.setItem('currentUser', JSON.stringify(response.user));
+        this.currentUserSubject.next(response.user);
+      }
+    })
+  );
+}
 }

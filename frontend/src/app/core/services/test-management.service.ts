@@ -106,13 +106,24 @@ cancelJob(jobId: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/run/cancel/${jobId}`, {});
   }
 
-generateTestWithAI(requirement: string, testName: string = '', targetSuite: string = '03_ui_tests.robot'): Observable<AIGenerateResponse> {
-  return this.http.post<AIGenerateResponse>(`${this.apiUrl}/generate`, {
-    requirement,
-    test_name: testName,
-    target_suite: targetSuite
-  });
-}
+  generateTestWithAI(
+    requirement: string,
+    testName: string,
+    targetUrl?: string,
+    testData?: string,
+    targetSuite?: string
+  ): Observable<any> {
+    const body: Record<string, any> = {
+      requirement,
+      test_name: testName
+    };
+
+    if (targetUrl) body['target_url'] = targetUrl;
+    if (testData) body['test_data'] = testData;
+    if (targetSuite) body['target_suite'] = targetSuite;
+
+    return this.http.post<any>(`${this.apiUrl}/generate`, body);
+  } 
 
 saveGeneratedTest(filename: string, content: string): Observable<{ message: string; file_path: string }> {
   return this.http.post<{ message: string; file_path: string }>(

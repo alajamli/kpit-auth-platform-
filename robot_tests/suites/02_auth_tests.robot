@@ -186,3 +186,12 @@ TC-902 Verify Login with Empty Inputs
     # Auto-generated steps
     Log    ✅ This is an auto-generated test case
     Sleep    1s    reason=Simulate test execution
+
+
+
+
+TC-API Interne Login Ahmed
+    [Documentation]    Vérifie que la connexion de l'utilisateur Ahmed réussit avec les identifiants valides.
+    [Tags]             ai-generated    api    login_success
+    Create API Session
+    Login Should Succeed    ${AHMED_LOGIN}    ${AHMED_PASSWORD}

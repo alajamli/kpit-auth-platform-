@@ -18,25 +18,25 @@ class RobotFrameworkRunner:
     """
     
     def __init__(self, project_root: str):
-        """
-        Initialise le runner.
-        
-        Args:
-            project_root: Chemin racine du projet
-        """
         self.project_root = Path(project_root)
         self.robot_tests_dir = self.project_root / 'robot_tests'
         self.suites_dir = self.robot_tests_dir / 'suites'
         self.results_dir = self.robot_tests_dir / 'results'
         
-        # Détection dynamique du chemin du Python de l'environnement virtuel (Cross-platform)
-        if sys.platform == "win32":
-            self.venv_python = self.robot_tests_dir / 'venv' / 'Scripts' / 'python.exe'
-        else:
-            self.venv_python = self.robot_tests_dir / 'venv' / 'bin' / 'python'
-        
-        # Créer le dossier results s'il n'existe pas
+        # S'assurer que les dossiers requis existent
+        self.suites_dir.mkdir(parents=True, exist_ok=True)
         self.results_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Détection dynamique : VENV si présent, sinon Python système (Docker)
+        if sys.platform == "win32":
+            candidate = self.robot_tests_dir / 'venv' / 'Scripts' / 'python.exe'
+        else:
+            candidate = self.robot_tests_dir / 'venv' / 'bin' / 'python'
+            
+        if candidate.exists():
+            self.venv_python = candidate
+        else:
+            self.venv_python = Path(sys.executable)
     
     def run_tests(
         self,
@@ -45,20 +45,6 @@ class RobotFrameworkRunner:
         include_tags: Optional[List[str]] = None,
         exclude_tags: Optional[List[str]] = None
     ) -> Dict:
-        # Le reste du fichier demeure identique...
-        """
-        Exécuter des tests Robot Framework.
-        
-        Args:
-            test_names: Liste des noms de tests à exécuter (None = tous)
-            suite_file: Fichier .robot spécifique (None = tous)
-            include_tags: Tags à inclure
-            exclude_tags: Tags à exclure
-        
-        Returns:
-            Dict avec les résultats de l'exécution
-        """
-        # Construire la commande robot
         cmd = self._build_command(
             test_names=test_names,
             suite_file=suite_file,
@@ -67,16 +53,13 @@ class RobotFrameworkRunner:
         )
         
         try:
-            # Exécuter la commande
             result = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
                 cwd=str(self.robot_tests_dir),
-                timeout=300  # 5 minutes max
+                timeout=300
             )
-            
-            # Parser le résultat
             return self._parse_result(result)
             
         except subprocess.TimeoutExpired:
@@ -105,24 +88,16 @@ class RobotFrameworkRunner:
         include_tags: Optional[List[str]] = None,
         exclude_tags: Optional[List[str]] = None
     ) -> List[str]:
-        """
-        Construit la commande robot à exécuter.
-        
-        Returns:
-            List[str]: La commande sous forme de liste
-        """
         cmd = [
             str(self.venv_python),
             '-m', 'robot',
             '-d', str(self.results_dir)
         ]
         
-        # Ajouter les filtres par nom de test
         if test_names:
             for test_name in test_names:
                 cmd.extend(['--test', test_name])
         
-        # Ajouter les filtres par tag
         if include_tags:
             for tag in include_tags:
                 cmd.extend(['--include', tag])
@@ -131,7 +106,6 @@ class RobotFrameworkRunner:
             for tag in exclude_tags:
                 cmd.extend(['--exclude', tag])
         
-        # Ajouter le fichier/dossier cible
         if suite_file:
             cmd.append(str(self.suites_dir / suite_file))
         else:
@@ -140,24 +114,12 @@ class RobotFrameworkRunner:
         return cmd
     
     def _parse_result(self, result: subprocess.CompletedProcess) -> Dict:
-        """
-        Parse le résultat de l'exécution Robot Framework.
-        
-        Args:
-            result: Résultat de subprocess.run
-        
-        Returns:
-            Dict avec les résultats structurés
-        """
         output = result.stdout + result.stderr
         
-        # Chercher les statistiques dans la sortie
         total = 0
         passed = 0
         failed = 0
         
-        # Parser la ligne de résumé
-        # Format : "X tests, Y passed, Z failed"
         for line in output.split('\n'):
             line = line.strip()
             if 'passed' in line.lower() and 'failed' in line.lower():
@@ -180,11 +142,9 @@ class RobotFrameworkRunner:
                         except (ValueError, IndexError):
                             pass
         
-        # Si pas trouvé total, calculer
         if total == 0:
             total = passed + failed
         
-        # Extraire les résultats individuels des tests
         test_results = self._extract_individual_results(output)
         
         return {
@@ -199,41 +159,21 @@ class RobotFrameworkRunner:
         }
     
     def _extract_individual_results(self, output: str) -> List[Dict]:
-        """
-        Extrait les résultats individuels de chaque test depuis la sortie.
-        
-        Returns:
-            Liste des résultats par test
-        """
         test_results = []
-        
         for line in output.split('\n'):
             line = line.strip()
-            
-            # Chercher les lignes de résultat de test
-            # Format : "TC-XXX Test Name ... | PASS |" ou "| FAIL |"
             if '| PASS |' in line or '| FAIL |' in line:
-                # Nettoyer la ligne
                 status = 'PASS' if '| PASS |' in line else 'FAIL'
-                
-                # Extraire le nom du test
                 test_part = line.split('|')[0].strip()
-                
-                # Enlever les points de remplissage
                 test_name = test_part.rstrip('. ')
-                
                 if test_name and not test_name.startswith('-'):
                     test_results.append({
                         "name": test_name,
                         "status": status
                     })
-        
         return test_results
     
     def get_report_path(self) -> Optional[str]:
-        """
-        Retourne le chemin du rapport HTML s'il existe.
-        """
         report_path = self.results_dir / 'report.html'
         if report_path.exists():
             return str(report_path)
@@ -241,10 +181,10 @@ class RobotFrameworkRunner:
 
 
 def get_default_runner() -> RobotFrameworkRunner:
-    """
-    Retourne un runner configuré avec le chemin par défaut.
-    """
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
+    if os.path.exists('/app/robot_tests'):
+        project_root = '/app'
+    else:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
     
     return RobotFrameworkRunner(project_root)

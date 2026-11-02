@@ -6,15 +6,21 @@ l'application Flask avec toutes ses extensions.
 """
 from flask import Flask
 from flask_cors import CORS
-from flask_restx import Api
+from flask_restx import Api, Resource, Namespace
 
 from app.config import config
-from app.extensions import db, migrate
-from app.extensions import db, migrate, jwt,limiter
+from app.extensions import db, migrate, jwt, limiter
+import os
+
 
 def create_app(config_name='development'):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
+     # CRÉATION AUTOMATIQUE DES DOSSIERS DE TESTS ROBOT FRAMEWORK
+    os.makedirs('/robot_tests/suites', exist_ok=True)
+    os.makedirs(os.path.abspath(os.path.join(app.root_path, '..', 'robot_tests', 'suites')), exist_ok=True)
+    os.makedirs(os.path.abspath(os.path.join(app.root_path, '..', 'instance')), exist_ok=True)
+    os.makedirs(os.path.abspath(os.path.join(app.root_path, '..', 'reports')), exist_ok=True)
     
     # Initialiser les extensions
     db.init_app(app)
@@ -32,11 +38,13 @@ def create_app(config_name='development'):
     # Configuration CORS
     CORS(app, resources={
         r"/api/*": {
-            "origins": ["http://localhost:4200"]
+            "origins": "*",
+            "allow_headers": ["Content-Type", "Authorization"],
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
         }
     })
     
-    # Swagger API
+    # Swagger API Configuration
     authorizations = {
         'Bearer': {
             'type': 'apiKey',
@@ -57,8 +65,11 @@ def create_app(config_name='development'):
         security='Bearer'
     )
     
-    # Namespaces
-    from flask_restx import Resource, Namespace
+    # ============================================
+    # REGISTER NAMESPACES (ROUTES)
+    # ============================================
+    
+    # 1. Health check namespace
     ns_health = Namespace('health', description='Health check endpoints')
     api.add_namespace(ns_health)
     
@@ -71,106 +82,18 @@ def create_app(config_name='development'):
                 'version': '1.0.0'
             }
     
+    # 2. Authentication Namespace (/api/auth)
     from app.routes.auth import auth_ns
     api.add_namespace(auth_ns)
     
+    # 3. User Management Namespace (/api/users)  <-- AJOUTÉ ICI
+    from app.routes.users import users_ns
+    api.add_namespace(users_ns)
+    
+    # 4. Test Manager Namespace (/api/tests)
     from app.routes.test_manager import test_ns
     api.add_namespace(test_ns)
+
     
-    return app
-    """
-    Créer et configurer une instance de l'application Flask.
-    
-    Args:
-        config_name (str): Nom de la configuration à utiliser
-    
-    Returns:
-        Flask: Instance de l'application Flask configurée
-    """
-    # ============================================
-    # CRÉER L'INSTANCE FLASK
-    # ============================================
-    app = Flask(__name__)
-    
-    # ============================================
-    # CHARGER LA CONFIGURATION
-    # ============================================
-    app.config.from_object(config[config_name])
-    
-    # ============================================
-    # INITIALISER LES EXTENSIONS
-    # ============================================
-    db.init_app(app)
-    migrate.init_app(app, db)
-    jwt.init_app(app)
-    limiter.init_app(app)
-    
-    # ============================================
-    # IMPORTER LES MODÈLES
-    # ============================================
-    from app.models import User
-    
-    # ============================================
-    # CORS
-    # ============================================
-    CORS(app, resources={
-        r"/api/*": {
-            "origins": ["http://localhost:4200"]
-        }
-    })
-    
-        # ============================================
-    # SWAGGER API CONFIGURATION
-    # ============================================
-    
-    # 1. Définition du schéma de sécurité Swagger (OpenAPI)
-    authorizations = {
-        'Bearer': {
-            'type': 'apiKey',
-            'in': 'header',
-            'name': 'Authorization',
-            'description': "Tapez 'Bearer ' suivi de votre token. Exemple: Bearer eyJhbGciOi..."
-        }
-    }
-    
-    # 2. Création de l'instance API avec la sécurité activée
-    api = Api(
-        app,
-        version='1.0',
-        title='KPIT Auth Platform API',
-        description='AI-Enhanced Authentication Platform - REST API Documentation',
-        doc='/docs',
-        prefix='/api',
-        authorizations=authorizations,  # ← AJOUT ICI
-        security='Bearer'               # ← AJOUT ICI (Active le cadenas globalement)
-    )
-    
-    # ============================================
-    # NAMESPACES (Blueprints)
-    # ============================================
-    from flask_restx import Resource, Namespace
-    
-    # --- Namespace : Health ---
-    ns_health = Namespace('health', description='Health check endpoints')
-    api.add_namespace(ns_health)
-    
-    @ns_health.route('')
-    class HealthCheck(Resource):
-        """Vérifier que l'API est en ligne."""
-        
-        def get(self):
-            """Retourne le statut de l'API."""
-            return {
-                'status': 'healthy',
-                'message': 'KPIT Auth Platform API is running',
-                'version': '1.0.0'
-            }
-    
-    # --- Namespace : Auth ---
-    from app.routes.auth import auth_ns
-    api.add_namespace(auth_ns)
-    # --- Namespace : Tests Manager ---
-    from app.routes.test_manager import test_ns
-    api.add_namespace(test_ns)
     
     return app

@@ -15,8 +15,9 @@ from app.services.robot_runner import get_default_runner
 from app.services.async_robot_runner import get_async_runner
 from app.services.robot_file_manager import get_file_manager
 from app.utils.decorators import roles_required
+import logging
 
-
+logger = logging.getLogger(__name__)
 test_ns = Namespace(
     'tests',
     description='Test Management - List, Run and Manage Robot Framework tests'
@@ -35,10 +36,13 @@ test_case_model = test_ns.model('TestCaseRequest', {
     'tags': fields.List(fields.String, description='Tags'),
 })
 
-# Modèles Swagger pour la génération LLM
-generate_test_model = test_ns.model('GenerateTestRequest', {
-    'requirement': fields.String(required=True, description='Exigence fonctionnelle en langage naturel'),
-    'test_name': fields.String(required=False, description='Nom du TestCase', default='AI Generated Test')
+# Modèles Swagger pour la génération LLM dynamique (Interne & Externe)
+generate_test_model = test_ns.model('GenerateTest', {
+    'requirement': fields.String(required=True, description='Functional requirement'),
+    'test_name': fields.String(required=False, description='Test case name'),
+    'target_suite': fields.String(required=False, description='Target .robot suite file'),
+    'target_url': fields.String(required=False, description='External app/API URL'),
+    'test_data': fields.String(required=False, description='Credentials or parameters'),
 })
 
 save_test_model = test_ns.model('SaveTestRequest', {
@@ -311,23 +315,32 @@ class GenerateTestScript(Resource):
     @test_ns.doc(security='Bearer')
     def post(self):
         """
-        [Layer 3 - AI] Génère un script de test Robot Framework via LLM à partir d'une exigence
+        [Layer 3 - AI] Génère un script de test Robot Framework via LLM
+        (Suite interne KPIT ou Cible Client Externe).
         """
         data = request.get_json() or {}
-        requirement = data.get('requirement', '').strip()
-        test_name = data.get('test_name', 'TC-AI Generated Test').strip()
-        target_suite = data.get('target_suite', '03_ui_tests.robot').strip() # Récupère la suite sélectionnée dans Angular
+        requirement = (data.get('requirement') or '').strip()
+        test_name = (data.get('test_name') or 'TC-AI Generated Test').strip()
+        target_suite = (data.get('target_suite') or '03_ui_tests.robot').strip()
+        target_url = (data.get('target_url') or '').strip()
+        test_data = (data.get('test_data') or '').strip()
         
         if not requirement:
             return {'message': 'L\'exigence fonctionnelle est requise'}, 400
             
         try:
             from app.services.llm_service import LLMService
-            result = LLMService.generate_robot_test(requirement, test_name, target_suite)
+            result = LLMService.generate_robot_test(
+                requirement=requirement,
+                test_name=test_name,
+                target_suite=target_suite,
+                target_url=target_url or None,
+                test_data=test_data or None
+            )
             return result, 200
         except Exception as e:
+            logger.exception("AI generation failed")
             return {'message': f'Erreur lors de la génération IA: {str(e)}'}, 500
-
 
 @test_ns.route('/save-generated')
 class SaveGeneratedTestScript(Resource):
@@ -356,7 +369,6 @@ class SaveGeneratedTestScript(Resource):
             os.makedirs(suites_dir, exist_ok=True)
             file_path = os.path.join(suites_dir, safe_filename)
             
-            # Si le fichier existe déjà, on extrait la section *** Test Cases *** pour l'ajouter proprement
             if os.path.exists(file_path):
                 import re
                 test_case_match = re.search(r'\*\*\* Test Cases \*\*\*\s*(.*)', content, re.DOTALL)
@@ -365,7 +377,6 @@ class SaveGeneratedTestScript(Resource):
                 with open(file_path, 'a', encoding='utf-8') as f:
                     f.write(f"\n\n{test_case_body}\n")
             else:
-                # Si le fichier n'existe pas, on écrit le fichier complet avec en-têtes
                 with open(file_path, 'w', encoding='utf-8') as f:
                     f.write(content)
                 

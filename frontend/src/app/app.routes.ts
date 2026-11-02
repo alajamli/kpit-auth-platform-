@@ -15,7 +15,12 @@ export const routes: Routes = [
     component: LoginComponent,
     title: 'Login - KPIT Auth Platform'
   },
- {
+  {
+    path: 'signup',
+    loadComponent: () => import('./features/auth/signup/signup.component').then(m => m.SignupComponent),
+    title: 'Sign Up - KPIT Auth Platform'
+  },
+  {
     path: '',
     component: MainLayoutComponent,
     children: [
@@ -24,6 +29,11 @@ export const routes: Routes = [
         component: WelcomeComponent,
         title: 'Dashboard - KPIT Test Manager'
       },
+      {
+      path: 'users',
+      loadComponent: () => import('./features/user-management/user-management.component').then(m => m.UserManagementComponent),
+      title: 'User Directory - KPIT Auth Platform'
+    },
       {
         path: 'tests',
         component: TestManagementComponent,
@@ -35,6 +45,4 @@ export const routes: Routes = [
     path: '**',
     redirectTo: 'login'
   }
-
-
 ];

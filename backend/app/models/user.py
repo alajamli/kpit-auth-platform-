@@ -8,7 +8,6 @@ from datetime import datetime
 import bcrypt
 import pyotp
 
-
 from app.extensions import db
 
 
@@ -43,6 +42,18 @@ class User(db.Model):
         onupdate=datetime.utcnow,
         nullable=False
     )
+
+    # ============================================
+    # ALIAS DE COMPATIBILITÉ POUR IS_VERIFIED
+    # ============================================
+    @property
+    def is_verified(self) -> bool:
+        """Alias pour is_active (assure la compatibilité totale frontend/API)"""
+        return self.is_active
+
+    @is_verified.setter
+    def is_verified(self, value: bool) -> None:
+        self.is_active = value
 
     def __repr__(self):
         return f'<User {self.login} ({self.email})>'
@@ -101,10 +112,10 @@ class User(db.Model):
         return self.otp_secret
 
     def get_totp(self) -> pyotp.TOTP:
-        """Retourne l'objet TOTP configuré avec la clé secrète de l'utilisateur."""
-        if not self.otp_secret:
-            self.generate_otp_secret()
-        return pyotp.TOTP(self.otp_secret)
+     """Retourne l'objet TOTP configuré avec la clé secrète de l'utilisateur."""
+     if not self.otp_secret:
+        self.generate_otp_secret()  # <-- Corrigé avec self
+     return pyotp.TOTP(self.otp_secret)
 
     def verify_otp(self, code: str) -> bool:
         """
@@ -129,6 +140,7 @@ class User(db.Model):
             'login': self.login,
             'role': self.role,
             'is_active': self.is_active,
+            'is_verified': self.is_active, # Pour synchronisation Frontend
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
         }

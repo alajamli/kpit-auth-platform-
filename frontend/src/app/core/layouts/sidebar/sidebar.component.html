@@ -10,7 +10,7 @@
   </div>
 
   <nav class="sidebar-nav">
-    <div *ngFor="let section of navigationSections" class="nav-section">
+    <div *ngFor="let section of filteredSections" class="nav-section">
 
       <div class="nav-subheading" *ngIf="!collapsed || mobileOpen">
         {{ section.title }}

@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # Service 1 : API Flask + Selenium + Robot Framework
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kpit_backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-kpit-super-secret-jwt-key-2026}
+      - SMTP_HOST=${SMTP_HOST:-smtp-relay.brevo.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-dev@kpit.com}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-dummy-smtp-pass}
+    volumes:
+      - ./backend/instance:/app/instance
+      - ./backend/reports:/app/reports
+      - ./backend/robot_tests:/app/robot_tests
+    networks:
+      - kpit-network
+
+  # Service 2 : Frontend Angular + Serveur Nginx
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: kpit_frontend
+    restart: always
+    ports:
+      - "9000:80"
+    depends_on:
+      - backend
+    networks:
+      - kpit-network
+
+networks:
+  kpit-network:
+    driver: bridge

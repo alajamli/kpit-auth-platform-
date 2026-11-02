@@ -29,6 +29,8 @@ class Config:
     JSON_SORT_KEYS = False
     RESTX_MASK_SWAGGER = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # Dans backend/config.py :
+    GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '873850665777-jdo318981smul654qj10q6oc6ehibde3.apps.googleusercontent.com')
 
 
 class DevelopmentConfig(Config):
@@ -50,7 +52,7 @@ class TestingConfig(Config):
     TESTING = True
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
 
 
 config = {

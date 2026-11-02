@@ -8,7 +8,9 @@
       </div>
       <div>
         <h2 class="ai-dialog__title">{{ isEditMode ? 'Edit Test Case' : 'New Test Case' }}</h2>
-        <p class="ai-dialog__subtitle">{{ isEditMode ? 'Update test metadata' : 'Manual entry or AI-assisted generation' }}</p>
+        <p class="ai-dialog__subtitle">
+          {{ isEditMode ? 'Update test metadata' : 'Manual entry or AI-assisted generation' }}
+        </p>
       </div>
     </div>
     <button mat-icon-button mat-dialog-close class="ai-dialog__close" type="button">
@@ -18,12 +20,12 @@
 
   <mat-dialog-content class="ai-dialog__content">
 
-    <!-- MODE ÉDITION : formulaire seul -->
+    <!-- EDIT MODE -->
     <div *ngIf="isEditMode" class="ai-dialog__panel">
       <ng-container *ngTemplateOutlet="manualForm"></ng-container>
     </div>
 
-    <!-- MODE CRÉATION : 2 onglets -->
+    <!-- CREATE MODE : 2 tabs -->
     <mat-tab-group
       *ngIf="!isEditMode"
       [(selectedIndex)]="selectedTabIndex"
@@ -31,7 +33,7 @@
       color="primary"
       class="ai-dialog__tabs">
 
-      <!-- ONGLET MANUEL -->
+      <!-- MANUAL TAB -->
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">edit_note</mat-icon>
@@ -42,7 +44,7 @@
         </div>
       </mat-tab>
 
-      <!-- ONGLET IA -->
+      <!-- AI TAB -->
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">auto_awesome</mat-icon>
@@ -51,100 +53,121 @@
 
         <div class="ai-dialog__panel ai-panel">
 
-          <!-- Intro -->
           <div class="ai-banner">
             <mat-icon>psychology</mat-icon>
             <div>
               <div class="ai-banner__title">Groq LLM · Robot Framework</div>
-              <div class="ai-banner__text">Describe a scenario in natural language. The model generates a ready-to-run .robot script.</div>
+              <div class="ai-banner__text">
+                Describe a scenario in natural language. Optionally target any URL and supply credentials.
+              </div>
             </div>
           </div>
 
-          <!-- Configuration de la Suite et du Nom de Test Case -->
-          <div class="row g-2 mb-2">
-            <div class="col-6">
-              <mat-form-field appearance="outline" class="w-100">
-                <mat-label>Target suite</mat-label>
-                <mat-select [(ngModel)]="aiTargetSuite">
-                  <mat-option *ngFor="let s of suites" [value]="s">{{ s }}</mat-option>
-                  <mat-option value="NEW_SUITE">+ Create new suite</mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
+          <!-- Suite + Test name -->
+          <div class="ai-grid-2">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Target suite</mat-label>
+              <mat-select [(ngModel)]="aiTargetSuite" name="aiTargetSuite">
+                <mat-option *ngFor="let s of suites" [value]="s">{{ s }}</mat-option>
+                <mat-option value="NEW_SUITE">+ Create new suite</mat-option>
+              </mat-select>
+            </mat-form-field>
 
-            <!-- Si Nouvelle Suite choisie -->
-            <div class="col-6" *ngIf="aiTargetSuite === 'NEW_SUITE'">
-              <mat-form-field appearance="outline" class="w-100">
-                <mat-label>New suite filename (.robot)</mat-label>
-                <input matInput [(ngModel)]="customSuiteName" placeholder="e.g. 03_ai_generated_tests">
-              </mat-form-field>
-            </div>
+            <mat-form-field appearance="outline" class="w-100" *ngIf="aiTargetSuite === 'NEW_SUITE'">
+              <mat-label>New suite filename (.robot)</mat-label>
+              <input matInput [(ngModel)]="customSuiteName" name="customSuiteName"
+                     placeholder="e.g. 03_ai_generated_tests.robot" />
+            </mat-form-field>
 
-            <!-- Nom / ID du Test Case -->
-            <div class="col-6" *ngIf="aiTargetSuite !== 'NEW_SUITE'">
-              <mat-form-field appearance="outline" class="w-100">
-                <mat-label>Test case name / ID</mat-label>
-                <input matInput [(ngModel)]="aiTestName" placeholder="e.g. TC-AI-01 Verification 2FA">
-              </mat-form-field>
-            </div>
+            <mat-form-field appearance="outline" class="w-100" *ngIf="aiTargetSuite !== 'NEW_SUITE'">
+              <mat-label>Test case name / ID</mat-label>
+              <input matInput [(ngModel)]="aiTestName" name="aiTestName"
+                     placeholder="e.g. TC-AI-01 Verification 2FA" />
+            </mat-form-field>
           </div>
 
-          <!-- Prompt Requirement -->
+          <!-- Requirement -->
           <mat-form-field appearance="outline" class="w-100 ai-field">
             <mat-label>Functional requirement / User story</mat-label>
             <textarea
               matInput
               [(ngModel)]="aiRequirement"
+              name="aiRequirement"
               rows="3"
-              placeholder="Example: Verify that login with user sara and a wrong password shows an error notification."></textarea>
+              placeholder="Example: Verify login with user sara and a wrong password shows an error."></textarea>
             <mat-hint>Be specific: user, expected result, negative/positive path</mat-hint>
           </mat-form-field>
+
+          <!-- ★ Step 1.3 fields — MUST be visible here ★ -->
+          <div class="ai-grid-2">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Target URL (optional)</mat-label>
+              <input
+                matInput
+                type="url"
+                [(ngModel)]="targetUrl"
+                name="dialogTargetUrl"
+                placeholder="https://www.saucedemo.com"
+                [disabled]="isGenerating" />
+              <mat-icon matSuffix>link</mat-icon>
+              <mat-hint>Leave empty for this platform</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Credentials / parameters (optional)</mat-label>
+              <input
+                matInput
+                [(ngModel)]="testData"
+                name="dialogTestData"
+                placeholder="username=standard_user password=secret_sauce"
+                [disabled]="isGenerating" />
+              <mat-icon matSuffix>key</mat-icon>
+              <mat-hint>Injected into the generated script</mat-hint>
+            </mat-form-field>
+          </div>
 
           <div class="ai-actions-row">
             <button
               mat-stroked-button
               type="button"
               (click)="clearAI()"
-              [disabled]="isGenerating || (!aiRequirement && !generatedCode)">
+              [disabled]="isGenerating || (!aiRequirement && !targetUrl && !testData && !generatedCode)">
               <mat-icon>restart_alt</mat-icon>
               Reset
             </button>
 
             <button
-              mat-flat-button
-              color="primary"
-              class="btn-generate"
-              type="button"
-              (click)="generateWithAI()"
-              [disabled]="isGenerating || !aiRequirement || !aiRequirement.trim()">
-              <mat-spinner *ngIf="isGenerating" diameter="18" class="btn-spinner"></mat-spinner>
-              <mat-icon *ngIf="!isGenerating">auto_fix_high</mat-icon>
-              <span>{{ isGenerating ? 'Generating…' : 'Generate with Groq' }}</span>
+                mat-flat-button
+                color="primary"
+                class="btn-generate"
+                type="button"
+                (click)="generateWithAI()"
+                [disabled]="isGenerating || !aiRequirement || !aiRequirement.trim()">
+                <mat-spinner *ngIf="isGenerating" diameter="18" class="btn-spinner"></mat-spinner>
+                <mat-icon *ngIf="!isGenerating">auto_fix_high</mat-icon>
+                <span>{{ isGenerating ? 'Generating…' : 'Generate with Groq' }}</span>
             </button>
           </div>
 
-          <!-- Empty state -->
           <div class="ai-empty" *ngIf="!generatedCode && !isGenerating">
             <mat-icon>code_off</mat-icon>
             <p>Generated Robot Framework script will appear here</p>
           </div>
 
-          <!-- Loading -->
           <div class="ai-loading" *ngIf="isGenerating">
             <mat-spinner diameter="36" color="primary"></mat-spinner>
             <p>Calling LLM and building script…</p>
           </div>
 
-          <!-- Code preview — TOUJOURS visible si code présent -->
           <div class="code-card" *ngIf="generatedCode && !isGenerating">
             <div class="code-card__toolbar">
               <div class="code-card__meta">
                 <span class="code-pill">.robot</span>
                 <span
                   class="provider-pill"
-                  [class.provider-pill--groq]="aiProvider === 'groq'"
-                  [class.provider-pill--fallback]="aiProvider !== 'groq'">
-                  <mat-icon>{{ aiProvider === 'groq' ? 'bolt' : 'build' }}</mat-icon>
+                  [class.provider-pill--groq]="aiProvider === 'groq' || (aiProvider | lowercase)?.includes('groq')"
+                  [class.provider-pill--fallback]="aiProvider === 'fallback'">
+                  <mat-icon>{{ (aiProvider | lowercase)?.includes('groq') ? 'bolt' : 'build' }}</mat-icon>
                   {{ aiProvider | uppercase }}
                 </span>
               </div>
@@ -153,7 +176,6 @@
                 Copy
               </button>
             </div>
-
             <pre class="code-card__body"><code>{{ generatedCode }}</code></pre>
           </div>
 
@@ -163,11 +185,9 @@
 
   </mat-dialog-content>
 
-  <!-- Footer -->
   <mat-dialog-actions class="ai-dialog__footer">
     <button mat-button type="button" mat-dialog-close>Cancel</button>
 
-    <!-- Manuel : édition OU onglet 0 -->
     <button
       *ngIf="isEditMode || selectedTabIndex === 0"
       mat-flat-button
@@ -178,7 +198,6 @@
       Save Test Case
     </button>
 
-    <!-- IA : onglet 1 — actif SEULEMENT si code généré -->
     <button
       *ngIf="!isEditMode && selectedTabIndex === 1"
       mat-flat-button
@@ -195,29 +214,29 @@
 
 </div>
 
-<!-- Formulaire manuel réutilisé -->
+<!-- Manual form template (single definition) -->
 <ng-template #manualForm>
   <div class="manual-form">
     <mat-form-field appearance="outline" class="w-100">
       <mat-label>Target suite</mat-label>
-      <mat-select [(ngModel)]="suiteName">
+      <mat-select [(ngModel)]="suiteName" name="suiteName">
         <mat-option *ngFor="let s of suites" [value]="s">{{ s }}</mat-option>
       </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="w-100">
       <mat-label>Test case name</mat-label>
-      <input matInput [(ngModel)]="testName" placeholder="e.g. TC-010 Invalid Login">
+      <input matInput [(ngModel)]="testName" name="testName" placeholder="e.g. TC-010 Invalid Login" />
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="w-100">
       <mat-label>Documentation</mat-label>
-      <textarea matInput [(ngModel)]="documentation" rows="2"></textarea>
+      <textarea matInput [(ngModel)]="documentation" name="documentation" rows="2"></textarea>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="w-100">
       <mat-label>Tags</mat-label>
-      <mat-select [(ngModel)]="selectedTags" multiple>
+      <mat-select [(ngModel)]="selectedTags" name="selectedTags" multiple>
         <mat-option *ngFor="let tag of availableTags" [value]="tag">{{ tag }}</mat-option>
       </mat-select>
     </mat-form-field>

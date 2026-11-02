@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
+import { AuthService } from '../../services/auth.service';
 
 interface NavItem {
   label: string;
@@ -27,6 +28,8 @@ interface NavSection {
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
+
+  
   @Input() collapsed = false;
   /** Ouverture en mode tiroir (mobile) — piloté par le layout */
   @Input() mobileOpen = false;
@@ -70,8 +73,8 @@ export class SidebarComponent {
         {
           label: 'Users',
           icon: 'people',
-          route: '',
-          badge: { text: 'SOON', color: 'slate' }
+          route: '/users',
+          
         },
         {
           label: 'Settings',
@@ -83,9 +86,24 @@ export class SidebarComponent {
     }
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router , private authService: AuthService) {
 
-  navigateTo(item: NavItem): void {
+  }
+  get filteredSections(): NavSection[] {
+  const role = this.authService.getCurrentUser()?.role;
+  return this.navigationSections.map(section => ({
+    ...section,
+    items: section.items.filter(item => {
+      // Seuls les admins voient "Users"
+      if (item.route === '/users') {
+        return role === 'admin';
+      }
+      return true;
+    })
+  }));
+}
+
+  navigateTo (item: NavItem): void {
     if (item.route) {
       this.router.navigate([item.route]);
     }

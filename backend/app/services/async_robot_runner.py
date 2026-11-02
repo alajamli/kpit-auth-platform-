@@ -26,13 +26,23 @@ class AsyncRobotRunner:
         self.suites_dir = self.robot_tests_dir / 'suites'
         self.results_dir = self.robot_tests_dir / 'results'
         
+        # S'assurer que les dossiers requis existent
+        self.suites_dir.mkdir(parents=True, exist_ok=True)
+        self.results_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Détection dynamique : VENV si présent, sinon Python système (Docker)
         if sys.platform == "win32":
-            self.venv_python = self.robot_tests_dir / 'venv' / 'Scripts' / 'python.exe'
+            candidate = self.robot_tests_dir / 'venv' / 'Scripts' / 'python.exe'
         else:
-            self.venv_python = self.robot_tests_dir / 'venv' / 'bin' / 'python'
+            candidate = self.robot_tests_dir / 'venv' / 'bin' / 'python'
+            
+        if candidate.exists():
+            self.venv_python = candidate
+        else:
+            self.venv_python = Path(sys.executable)
             
         self.jobs: Dict[str, Dict] = {}
-        self.processes: Dict[str, subprocess.Popen] = {}  # Pour garder la trace des processus à annuler
+        self.processes: Dict[str, subprocess.Popen] = {}
         self.jobs_lock = threading.Lock()
         
     def start_job(self, test_names: Optional[List[str]] = None, suite_file: Optional[str] = None, include_tags: Optional[List[str]] = None, exclude_tags: Optional[List[str]] = None) -> str:
@@ -69,7 +79,7 @@ class AsyncRobotRunner:
             return self.jobs.get(job_id)
             
     def cancel_job(self, job_id: str) -> bool:
-        """Annule un job en tuant l'arbre de processus natif (Chrome inclus)."""
+        """Annule un job en tuant l'arbre de processus natif."""
         process = None
 
         with self.jobs_lock:
@@ -79,7 +89,6 @@ class AsyncRobotRunner:
                 
             process = self.processes.get(job_id)
             
-            # Mise à jour de l'UI
             job['status'] = 'failed'
             job['error'] = 'Execution cancelled by user'
             job['ended_at'] = datetime.now().isoformat()
@@ -101,13 +110,11 @@ class AsyncRobotRunner:
         return True
 
     def _terminate_process_tree(self, process: subprocess.Popen) -> None:
-        """Méthode native pour tuer Robot et le navigateur sans dépendance externe."""
         if process.poll() is not None:
             return
             
         pid = process.pid
         if sys.platform == 'win32':
-            # /F = force, /T = kill process tree
             subprocess.run(['taskkill', '/F', '/T', '/PID', str(pid)], capture_output=True, check=False)
         else:
             try:
@@ -126,7 +133,7 @@ class AsyncRobotRunner:
             self._add_log(job_id, f'Found {expected_total} test case(s) to run')
 
             cmd = self._build_command(test_names, suite_file, include_tags, exclude_tags)
-            self._add_log(job_id, 'Starting test execution...')
+            self._add_log(job_id, f'Starting test execution: {" ".join(cmd)}')
             
             process = subprocess.Popen(
                 cmd,
@@ -138,7 +145,6 @@ class AsyncRobotRunner:
                 universal_newlines=True
             )
             
-            # Stocker pour l'annulation
             with self.jobs_lock:
                 self.processes[job_id] = process
             
@@ -151,7 +157,7 @@ class AsyncRobotRunner:
             
             with self.jobs_lock:
                 job = self.jobs.get(job_id)
-                if job and job['status'] != 'failed': # Si pas annulé
+                if job and job['status'] != 'failed':
                     if job['completed'] > 0 and job['total'] != job['completed']:
                         job['total'] = job['completed']
                     job['status'] = 'completed'
@@ -172,7 +178,6 @@ class AsyncRobotRunner:
                 self.processes.pop(job_id, None)
 
     def _parse_line(self, job_id: str, line: str):
-        """Parse la sortie de Robot Framework en temps réel pour mettre à jour l'overlay."""
         with self.jobs_lock:
             job = self.jobs.get(job_id)
             if not job or job.get('status') == 'failed':
@@ -190,19 +195,16 @@ class AsyncRobotRunner:
                 parts = line.split('|')
                 test_part = parts[0].strip().rstrip('. ').strip()
                 
-                # RECHERCHE DE 'TC-' N'IMPORTE OÙ DANS LE NOM (Aide à ignorer le nom de la suite)
-                if 'TC-' not in test_part:
-                    return
+                status = 'PASS' if is_pass else 'FAIL'
                 
-                # Extraire le nom à partir de 'TC-'
-                tc_index = test_part.find('TC-')
-                short_name = test_part[tc_index:].split('::')[0].strip().rstrip('. ').strip()
+                # Récupération du nom du test
+                short_name = test_part
+                if 'TC-' in test_part:
+                    tc_index = test_part.find('TC-')
+                    short_name = test_part[tc_index:].split('::')[0].strip().rstrip('. ').strip()
                 
-                # Éviter les doublons de comptage
                 if any(t['name'] == short_name for t in job['tests']):
                     return
-                
-                status = 'PASS' if is_pass else 'FAIL'
                 
                 job['completed'] += 1
                 if status == 'PASS':
@@ -216,15 +218,12 @@ class AsyncRobotRunner:
                 job['current_test'] = None
                 return
             
-            # Détecter le début d'un test pour afficher le sous-titre "Running..."
             stripped = line.strip()
             if 'TC-' in stripped and '|' not in stripped:
                 tc_index = stripped.find('TC-')
                 test_name = stripped[tc_index:].split('::')[0].strip().rstrip('. ').strip()
                 if test_name:
                     job['current_test'] = test_name
-
-        
 
     def _compute_expected_total(self, test_names=None, suite_file=None, include_tags=None, exclude_tags=None) -> int:
         if test_names: return len(test_names)
@@ -237,7 +236,7 @@ class AsyncRobotRunner:
             if exclude_tags: tests = [t for t in tests if not any(tag in t.get('tags', []) for tag in exclude_tags)]
             return len(tests)
         except Exception:
-            return 0             
+            return 1
         
     def _build_command(self, test_names=None, suite_file=None, include_tags=None, exclude_tags=None) -> List[str]:
         cmd = [str(self.venv_python), '-m', 'robot', '-d', str(self.results_dir)]
@@ -271,8 +270,10 @@ _runner_instance: Optional[AsyncRobotRunner] = None
 def get_async_runner() -> AsyncRobotRunner:
     global _runner_instance
     if _runner_instance is None:
-        import os
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
+        if os.path.exists('/app/robot_tests'):
+            project_root = '/app'
+        else:
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
         _runner_instance = AsyncRobotRunner(project_root)
     return _runner_instance

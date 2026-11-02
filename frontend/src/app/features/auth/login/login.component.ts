@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, OnDestroy } from "@angular/core";
+import { Component, HostListener, OnInit, AfterViewInit, OnDestroy, NgZone } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
   FormBuilder,
@@ -15,8 +15,11 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatProgressBarModule } from "@angular/material/progress-bar";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
+import {  RouterLink } from '@angular/router'; // <-- 1. Importer RouterLink
 
 import { AuthService } from "../../../core/services/auth.service";
+
+declare var google: any;
 
 @Component({
   selector: "app-login",
@@ -31,11 +34,12 @@ import { AuthService } from "../../../core/services/auth.service";
     MatIconModule,
     MatProgressBarModule,
     MatSnackBarModule,
+    RouterLink
   ],
   templateUrl: "./login.component.html",
   styleUrl: "./login.component.scss",
 })
-export class LoginComponent implements OnInit, OnDestroy {
+export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   loginForm!: FormGroup;
   otpForm!: FormGroup;
 
@@ -44,7 +48,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   hidePassword = true;
   errorMessage = "";
 
-  // Couche d’interface de la lampe : aucun changement du flux AuthService.
+  // Couche d’interface de la lampe
   lampPulled = false;
   lampLit = false;
   lampProgress = 0;
@@ -63,11 +67,15 @@ export class LoginComponent implements OnInit, OnDestroy {
   timerInterval: ReturnType<typeof setInterval> | null = null;
   canResend = false;
 
+  // Client ID Google OAuth2
+  private readonly googleClientId = '873850665777-jdo318981smul654qj10q6oc6ehibde3.apps.googleusercontent.com';
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
     private snackBar: MatSnackBar,
+    private ngZone: NgZone // Injecté pour synchroniser le callback externe Google
   ) {}
 
   ngOnInit(): void {
@@ -89,7 +97,67 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Début du geste de traction vers le bas. */
+  ngAfterViewInit(): void {
+    this.initGoogleSSO();
+  }
+
+  private initGoogleSSO(): void {
+    setTimeout(() => {
+      if (typeof google !== 'undefined' && google?.accounts?.id) {
+        google.accounts.id.initialize({
+          client_id: this.googleClientId,
+          callback: (response: any) => this.handleGoogleCallback(response)
+        });
+
+        const btnElement = document.getElementById('googleBtn');
+        if (btnElement) {
+          google.accounts.id.renderButton(btnElement, {
+            theme: 'outline',
+            size: 'large',
+            width: '100%',
+            text: 'continue_with'
+          });
+        }
+      }
+    }, 300);
+  }
+
+  /** Traitement optimisé dans NgZone pour une transition fluide sans lag ni chevauchement. */
+  private handleGoogleCallback(response: any): void {
+    if (response && response.credential) {
+      // Force l'exécution dans la zone Angular
+      this.ngZone.run(() => {
+        this.isLoading = true;
+        this.errorMessage = "";
+
+        this.authService.loginWithGoogle(response.credential).subscribe({
+          next: (res) => {
+            this.isLoading = false;
+            const userDisplayName = res.user?.first_name || res.user?.login || 'User';
+
+            this.snackBar.open(
+              `Welcome back, ${userDisplayName}!`,
+              "Close",
+              {
+                duration: 3000,
+                panelClass: ["snackbar-success"],
+                horizontalPosition: "right",
+                verticalPosition: "top",
+              }
+            );
+
+            // Navigation instantanée et destruction propre du composant Login
+            this.router.navigate(["/welcome"]);
+          },
+          error: (err) => {
+            this.isLoading = false;
+            this.errorMessage = err?.error?.error || err?.error?.message || "Google sign-in failed";
+          }
+        });
+      });
+    }
+  }
+
   startLampPull(event: PointerEvent): void {
     if (this.lampPulled) return;
     this.lampGrabbed = true;
@@ -120,7 +188,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
   }
 
-  /** Alternative accessible au geste tactile : Enter/Espace sur la lampe. */
   activateLampFromKeyboard(event: KeyboardEvent): void {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
@@ -128,7 +195,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
   }
 
-  /** Relâchement validé : la lampe s’allume avant de révéler la zone protégée. */
   private revealLogin(): void {
     if (this.lampPulled) return;
 
@@ -139,10 +205,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.lampRevealTimer = setTimeout(() => {
       this.lampPulled = true;
       this.lampRevealTimer = null;
+      this.initGoogleSSO();
     }, 360);
   }
 
-  /** Permet de masquer le formulaire sans toucher à l’état d’authentification. */
   hideLogin(): void {
     if (this.isLoading) return;
     if (this.lampRevealTimer) {
@@ -155,7 +221,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.lampGrabbed = false;
   }
 
-  // ÉTAPE 1 : Connexion Login/Password — conservée telle quelle.
   onSubmitLogin(): void {
     if (this.loginForm.invalid) return;
 
@@ -179,12 +244,11 @@ export class LoginComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err.message || "Invalid username or password";
+        this.errorMessage = err.error?.error || err.message || "Invalid username or password";
       },
     });
   }
 
-  // ÉTAPE 2 : Validation du code OTP — conservée telle quelle.
   onSubmitOTP(): void {
     if (this.otpForm.invalid) return;
 
@@ -202,7 +266,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err.message || "Invalid or expired 2FA code";
+        this.errorMessage = err.error?.error || err.message || "Invalid or expired 2FA code";
       },
     });
   }
@@ -231,7 +295,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err.message || "Failed to resend 2FA code";
+        this.errorMessage = err.error?.error || err.message || "Failed to resend 2FA code";
       },
     });
   }
@@ -268,6 +332,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.stopTimer();
     this.step = "credentials";
     this.errorMessage = "";
+    setTimeout(() => this.initGoogleSSO(), 100);
   }
 
   ngOnDestroy(): void {
