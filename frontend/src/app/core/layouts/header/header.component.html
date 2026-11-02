@@ -36,12 +36,12 @@
         <strong style="display:block; font-size:14px;">
           {{ currentUser?.first_name }} {{ currentUser?.last_name }}
         </strong>
-        <span style="color:#64748b; font-size:12px;">{{ currentUser?.email }}</span>
+        <span style="color:var(--vex-text-secondary); font-size:12px;">{{ currentUser?.email }}</span>
       </div>
       <mat-divider></mat-divider>
       <button mat-menu-item type="button" (click)="logout()">
         <mat-icon color="warn">logout</mat-icon>
-        <span style="color:#dc2626; font-weight:500;">Sign Out</span>
+        <span style="color:var(--vex-warn); font-weight:500;">Sign Out</span>
       </button>
     </mat-menu>
   </div>

@@ -1,6 +1,6 @@
 .vex-toolbar {
   height: var(--vex-toolbar-height);
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--vex-header-bg);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--vex-border);
   padding: 0 16px;
@@ -19,7 +19,7 @@
 .divider-vertical {
   width: 1px;
   height: 24px;
-  background: #e2e8f0;
+  background: var(--vex-border);
   margin: 0 8px;
 }
 
@@ -28,7 +28,7 @@
 
   &:hover {
     color: var(--vex-text) !important;
-    background: #f1f5f9 !important;
+    background: var(--vex-surface-2) !important;
   }
 }
 
@@ -52,7 +52,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--vex-on-primary);
   font-weight: 600;
   font-size: 12px;
 }

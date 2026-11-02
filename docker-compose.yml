@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Service 1 : API Flask + Selenium + Robot Framework
   backend:
@@ -33,7 +31,7 @@ services:
     container_name: kpit_frontend
     restart: always
     ports:
-      - "9000:80"
+      - "9900:80"
     depends_on:
       - backend
     networks:

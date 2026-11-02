@@ -38,4 +38,4 @@ RUN mkdir -p /app/robot_tests/suites /robot_tests/suites /app/instance /app/repo
 EXPOSE 5000
 
 # Démarrage de Gunicorn avec 1 Processus Multi-Threaded (Mémoire partagée pour les Jobs)
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--threads", "4", "--timeout", "120", "run:app"]
+CMD ["sh", "-c", "exec gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 1 --threads 4 --timeout 120 run:app"]

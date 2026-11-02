@@ -33,7 +33,7 @@
   .logo-icon {
     width: 32px;
     height: 32px;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--vex-primary) 0%, var(--vex-secondary) 100%);
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -108,7 +108,7 @@
     font-size: 20px;
     width: 20px;
     height: 20px;
-    color: #94a3b8; /* Gris clair par défaut */
+    color: var(--vex-text-hint); /* Gris clair par défaut */
     transition: color 0.2s ease;
   }
   
@@ -120,17 +120,17 @@
   
   &:hover {
     background: var(--vex-sidebar-item-hover);
-    color: #ffffff;
+    color: var(--vex-text);
     
     .nav-icon {
-      color: #ffffff;
+      color: var(--vex-text);
     }
   }
   
   /* État Actif Pro : Indicateur vertical à gauche */
   &.active {
     background: var(--vex-sidebar-item-active-bg);
-    color: #ffffff;
+    color: var(--vex-text);
     border-left-color: var(--vex-primary);
     border-radius: 0 6px 6px 0;
     
@@ -161,7 +161,7 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--vex-primary) 0%, var(--vex-secondary) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -186,7 +186,7 @@
     
     .user-role {
       font-size: 12px;
-      color: #9ca3af;
+      color: var(--vex-text-hint);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -194,7 +194,7 @@
   }
   
   .user-dropdown {
-    color: #9ca3af;
+    color: var(--vex-text-hint);
     font-size: 20px;
     width: 20px;
     height: 20px;
@@ -225,8 +225,8 @@
 }
 /* Ajout de la couleur du badge SOON */
 .badge-slate {
-  background: #334155; /* Slate 700 */
-  color: #f8fafc;
+  background: var(--vex-surface-2); /* Slate 700 */
+  color: var(--vex-text);
 }
 
 /* Rendre les éléments sans route visuellement inactifs */
@@ -239,7 +239,7 @@
     color: var(--vex-sidebar-item-color) !important;
     
     .nav-icon {
-      color: #94a3b8 !important;
+      color: var(--vex-text-hint) !important;
     }
   }
 }
@@ -253,13 +253,13 @@
   letter-spacing: 0.04em;
 
   &.badge-primary {
-    background: #4f46e5;
-    color: #ffffff;
+    background: var(--vex-primary);
+    color: var(--vex-on-primary);
   }
 
   &.badge-slate {
-    background: #334155;
-    color: #e2e8f0;
+    background: var(--vex-surface-2);
+    color: var(--vex-text);
   }
 }
 
@@ -272,7 +272,7 @@
     color: var(--vex-sidebar-item-color) !important;
 
     .nav-icon {
-      color: #94a3b8 !important;
+      color: var(--vex-text-hint) !important;
     }
   }
 }

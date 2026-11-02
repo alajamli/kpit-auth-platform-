@@ -4,7 +4,7 @@
 :host {
   display: block;
   min-height: 100%;
-  background: linear-gradient(180deg, #e8eaf6 0%, #eef0f8 40%, #f3f4f8 100%);
+  background: linear-gradient(180deg, var(--vex-surface-2) 0%, var(--vex-surface-2) 40%, var(--vex-background) 100%);
 }
 
 .welcome-page {
@@ -20,7 +20,7 @@
   .page-title {
     font-size: 28px;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--vex-text);
     margin: 0 0 8px 0;
     letter-spacing: -0.02em;
     font-family: var(--vex-font, 'Inter', sans-serif);
@@ -31,20 +31,20 @@
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    color: #64748b;
+    color: var(--vex-text-secondary);
     
-    .icon-home { font-size: 16px; width: 16px; height: 16px; color: #94a3b8; }
-    .dot { color: #cbd5e1; font-size: 14px; }
-    .crumb { color: #64748b; }
-    .current { color: #4f46e5; font-weight: 500; }
+    .icon-home { font-size: 16px; width: 16px; height: 16px; color: var(--vex-text-hint); }
+    .dot { color: var(--vex-text-hint); font-size: 14px; }
+    .crumb { color: var(--vex-text-secondary); }
+    .current { color: var(--vex-primary); font-weight: 500; }
   }
 }
 
 /* --- VEX CARD (Base pour toutes les cartes) --- */
 .vex-card {
-  background: #ffffff;
+  background: var(--vex-card);
   border-radius: 12px;
-  box-shadow: 0 4px 20px -2px rgba(17, 24, 39, 0.05), 0 2px 6px -1px rgba(17, 24, 39, 0.03);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
   border: 1px solid rgba(229, 231, 235, 0.6);
   position: relative;
   overflow: hidden;
@@ -60,10 +60,10 @@
     margin: 0;
     font-size: 16px;
     font-weight: 600;
-    color: #0f172a;
+    color: var(--vex-text);
   }
   
-  mat-icon { color: #94a3b8; }
+  mat-icon { color: var(--vex-text-hint); }
 }
 
 /* --- GRID LAYOUT --- */
@@ -84,12 +84,12 @@
    BANNIÈRE VEX (Exactement conforme à "Good Job, David!")
    ========================================================= */
 .banner-card {
-  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  background: linear-gradient(135deg, var(--vex-primary) 0%, var(--vex-primary-600) 100%);
   border-radius: 12px;
   padding: 28px 32px;
-  color: #ffffff;
+  color: var(--vex-on-primary);
   border: none;
-  box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.25);
+  box-shadow: 0 10px 25px -5px rgba(163, 229, 0, 0.25);
 
   .banner-content {
     display: flex;
@@ -106,7 +106,7 @@
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       font-size: 24px;
       font-weight: 600;
-      color: #ffffff;
+      color: var(--vex-on-primary);
       letter-spacing: -0.025em; /* Le secret du style VEX */
       line-height: 1.25;
       margin: 0 0 6px 0;
@@ -117,12 +117,12 @@
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       font-size: 14px;
       font-weight: 400;
-      color: rgba(255, 255, 255, 0.82);
+      color: rgba(11, 15, 25, 0.75);
       margin: 0;
       line-height: 1.5;
 
       strong {
-        color: #ffffff;
+        color: var(--vex-on-primary);
         font-weight: 600;
       }
     }
@@ -133,8 +133,8 @@
     flex-shrink: 0;
 
     .btn-vex-white {
-      background-color: #ffffff !important;
-      color: #4f46e5 !important;
+      background-color: var(--vex-card) !important;
+      color: var(--vex-primary) !important;
       border-radius: 9999px !important;
       height: 42px !important;
       padding: 0 22px !important;
@@ -178,7 +178,7 @@
   .kpi-value {
     font-size: 32px;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--vex-text);
     letter-spacing: -0.02em;
     line-height: 1;
   }
@@ -193,13 +193,13 @@
     
     mat-icon { font-size: 20px; width: 20px; height: 20px; }
     
-    &.icon-indigo { background: rgba(99, 102, 241, 0.1); color: #4f46e5; }
-    &.icon-amber { background: rgba(245, 158, 11, 0.1); color: #d97706; }
+    &.icon-indigo { background: rgba(163, 229, 0, 0.1); color: var(--vex-primary); }
+    &.icon-amber { background: rgba(163, 229, 0, 0.1); color: var(--vex-primary); }
   }
   
   .kpi-label {
     font-size: 13px;
-    color: #64748b;
+    color: var(--vex-text-secondary);
     margin-top: 8px;
     font-weight: 500;
   }
@@ -229,8 +229,8 @@
       align-items: baseline;
       gap: 12px;
       
-      .value { font-size: 40px; font-weight: 700; color: #0f172a; line-height: 1; letter-spacing: -0.02em; }
-      .label { font-size: 14px; color: #64748b; font-weight: 500; }
+      .value { font-size: 40px; font-weight: 700; color: var(--vex-text); line-height: 1; letter-spacing: -0.02em; }
+      .label { font-size: 14px; color: var(--vex-text-secondary); font-weight: 500; }
     }
     
     .trend-badge {
@@ -242,7 +242,7 @@
       font-size: 12px;
       font-weight: 600;
       
-      &.positive { background: #dcfce7; color: #16a34a; }
+      &.positive { background: var(--vex-success-soft); color: var(--vex-success); }
       mat-icon { font-size: 18px; width: 18px; height: 18px; }
     }
   }
@@ -277,11 +277,11 @@
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: #f1f5f9;
+      background: var(--vex-surface-2);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #64748b;
+      color: var(--vex-text-secondary);
       
       mat-icon { font-size: 20px; width: 20px; height: 20px; }
     }
@@ -290,8 +290,8 @@
       display: flex;
       flex-direction: column;
       
-      .label { font-size: 12px; color: #64748b; font-weight: 500; margin-bottom: 2px; }
-      .value { font-size: 14px; font-weight: 600; color: #0f172a; }
+      .label { font-size: 12px; color: var(--vex-text-secondary); font-weight: 500; margin-bottom: 2px; }
+      .value { font-size: 14px; font-weight: 600; color: var(--vex-text); }
     }
   }
 }
@@ -308,17 +308,17 @@
     gap: 16px;
     padding: 16px;
     border-radius: 10px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--vex-border);
     cursor: pointer;
     transition: all 0.2s ease;
-    background: #ffffff;
+    background: var(--vex-card);
     
     &:hover {
-      border-color: #cbd5e1;
-      box-shadow: 0 4px 12px -2px rgba(17, 24, 39, 0.05);
+      border-color: var(--vex-border-strong);
+      box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05);
       transform: translateY(-2px);
       
-      .arrow { color: #4f46e5; transform: translateX(2px); }
+      .arrow { color: var(--vex-primary); transform: translateX(2px); }
     }
     
     .action-icon {
@@ -331,9 +331,9 @@
       
       mat-icon { font-size: 22px; width: 22px; height: 22px; }
       
-      &.bg-indigo { background: rgba(99, 102, 241, 0.1); color: #4f46e5; }
-      &.bg-teal { background: rgba(20, 184, 166, 0.1); color: #0d9488; }
-      &.bg-red { background: rgba(239, 68, 68, 0.1); color: #dc2626; }
+      &.bg-indigo { background: rgba(163, 229, 0, 0.1); color: var(--vex-primary); }
+      &.bg-teal { background: rgba(20, 184, 166, 0.1); color: var(--vex-success); }
+      &.bg-red { background: rgba(239, 68, 68, 0.1); color: var(--vex-warn); }
     }
     
     .action-text {
@@ -341,16 +341,16 @@
       display: flex;
       flex-direction: column;
       
-      strong { font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 2px; }
-      span { font-size: 12px; color: #64748b; line-height: 1.4; }
-      .text-red { color: #dc2626; }
+      strong { font-size: 14px; font-weight: 600; color: var(--vex-text); margin-bottom: 2px; }
+      span { font-size: 12px; color: var(--vex-text-secondary); line-height: 1.4; }
+      .text-red { color: var(--vex-warn); }
     }
     
-    .arrow { color: #cbd5e1; transition: all 0.2s; }
+    .arrow { color: var(--vex-text-hint); transition: all 0.2s; }
     
     &.action-logout:hover {
-      border-color: #fca5a5;
-      .arrow { color: #dc2626; }
+      border-color: var(--vex-warn);
+      .arrow { color: var(--vex-warn); }
     }
   }
 }
@@ -370,9 +370,9 @@
     align-items: center;
     gap: 16px;
     padding: 20px;
-    background: #f8fafc;
+    background: var(--vex-background);
     border-radius: 12px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--vex-border);
     
     mat-icon { font-size: 32px; width: 32px; height: 32px; }
     
@@ -380,23 +380,23 @@
       display: flex;
       flex-direction: column;
       
-      .val { font-size: 16px; font-weight: 600; color: #0f172a; }
-      .lbl { font-size: 13px; color: #64748b; margin-top: 4px; }
+      .val { font-size: 16px; font-weight: 600; color: var(--vex-text); }
+      .lbl { font-size: 13px; color: var(--vex-text-secondary); margin-top: 4px; }
     }
     
     &.pending-history {
-      background: #ffffff;
-      border: 1px dashed #cbd5e1;
-      mat-icon { color: #94a3b8; }
+      background: var(--vex-card);
+      border: 1px dashed var(--vex-border-strong);
+      mat-icon { color: var(--vex-text-hint); }
     }
   }
 }
 /* --- LAYER 2 : AI SECURITY WIDGET VEX STYLES --- */
 .ai-security-card {
-  border-left: 4px solid #4f46e5 !important;
+  border-left: 4px solid var(--vex-primary) !important;
   
   &.warning-border {
-    border-left-color: #dc2626 !important;
+    border-left-color: var(--vex-warn) !important;
   }
 
   .card-header h3 {
@@ -420,21 +420,21 @@
   letter-spacing: 0.05em;
   
   &.badge-success {
-    background: #dcfce7;
-    color: #15803d;
+    background: var(--vex-success-soft);
+    color: var(--vex-success);
   }
   
   &.badge-danger {
-    background: #fee2e2;
-    color: #b91c1c;
+    background: var(--vex-danger-soft);
+    color: var(--vex-warn);
   }
 }
 
 .stat-block.block-danger {
-  background: #fef2f2 !important;
-  border-color: #fca5a5 !important;
+  background: var(--vex-danger-soft) !important;
+  border-color: var(--vex-warn) !important;
   
   .val {
-    color: #dc2626 !important;
+    color: var(--vex-warn) !important;
   }
 }

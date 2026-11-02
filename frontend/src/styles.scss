@@ -4,36 +4,7 @@
 
 @import url('https://rsms.me/inter/inter.css');
 
-/* ============ VEX DESIGN SYSTEM ============ */
-:root {
-  /* Colors - Assombries et plus professionnelles */
-  --vex-sidebar-bg: #0f172a; /* Slate 900 (plus profond) */
-  --vex-sidebar-item-color: #cbd5e1;
-  --vex-sidebar-item-hover: rgba(255, 255, 255, 0.06);
-  --vex-sidebar-item-active-bg: rgba(79, 70, 229, 0.15);
-  --vex-sidebar-subheading: rgba(148, 163, 184, 0.8);
-  
-  /* Primary plus foncé, moins agressif */
-  --vex-primary: #4f46e5;     /* Indigo 600 au lieu de 500 */
-  --vex-primary-600: #4338ca; /* Indigo 700 */
-  --vex-primary-700: #3730a3; /* Indigo 800 */
-  
-  --vex-accent: #d97706;      /* Ambre plus sombre */
-  --vex-warn: #dc2626;        /* Rouge standard pro */
-  
-  --vex-background: #f8fafc;
-  --vex-card: #ffffff;
-  --vex-border: #e2e8f0;
-  --vex-text: #0f172a;
-  --vex-text-secondary: #475569;
-  --vex-text-hint: #94a3b8;
-  --vex-text-icon: #64748b;
-  
-  /* Dimensions */
-  --vex-sidebar-width: 280px;
-  --vex-sidebar-collapsed-width: 72px;
-  --vex-toolbar-height: 64px;
-}
+@import 'theme/kpit-theme';
 
 /* ... (Garde ton code html, body, scrollbar) ... */
 
@@ -42,26 +13,30 @@
    Couleurs profondes, texte blanc, pas d'effet "jouet fluo"
    ========================================================= */
 .snackbar-success .mdc-snackbar__surface {
-  background-color: #064e3b !important; /* Vert forêt très sombre (Emerald 900) */
-  color: #ffffff !important;
+  background-color: #0f2a1f !important;
+  border-left: 4px solid var(--vex-success);
+  color: var(--vex-text) !important;
   font-weight: 500;
 }
 
 .snackbar-error .mdc-snackbar__surface {
-  background-color: #7f1d1d !important; /* Rouge sang (Red 900) */
-  color: #ffffff !important;
+  background-color: #2a1219 !important;
+  border-left: 4px solid var(--vex-warn);
+  color: var(--vex-text) !important;
   font-weight: 500;
 }
 
 .snackbar-warning .mdc-snackbar__surface {
-  background-color: #78350f !important; /* Ambre très sombre (Amber 900) */
-  color: #ffffff !important;
+  background-color: #2a1f0d !important;
+  border-left: 4px solid var(--vex-warning);
+  color: var(--vex-text) !important;
   font-weight: 500;
 }
 
 .snackbar-info .mdc-snackbar__surface {
-  background-color: #1e3a8a !important; /* Bleu sombre (Blue 900) */
-  color: #ffffff !important;
+  background-color: #1a1233 !important;
+  border-left: 4px solid var(--vex-secondary-text);
+  color: var(--vex-text) !important;
   font-weight: 500;
 }
 
@@ -84,7 +59,7 @@
     padding: 0 12px 0 4px !important;
     margin: 0 !important;
     border: none !important;
-    color: #9ca3af !important;
+    color: var(--vex-text-hint) !important;
 
     &::before,
     &::after {
@@ -121,14 +96,14 @@
   .mdc-notched-outline__leading,
   .mdc-notched-outline__notch,
   .mdc-notched-outline__trailing {
-    border-color: #e5e7eb !important;
+    border-color: var(--vex-border) !important;
   }
 
   /* Hover */
   &:hover .mdc-notched-outline__leading,
   &:hover .mdc-notched-outline__notch,
   &:hover .mdc-notched-outline__trailing {
-    border-color: #d1d5db !important;
+    border-color: var(--vex-border-strong) !important;
   }
 
   /*
@@ -138,7 +113,7 @@
    */
   &.mat-focused {
     .mdc-notched-outline__leading {
-      border-color: #6366f1 !important;
+      border-color: var(--kpit-lime) !important;
       border-top-width: 2px !important;
       border-bottom-width: 2px !important;
       border-left-width: 2px !important;
@@ -147,7 +122,7 @@
     }
 
     .mdc-notched-outline__notch {
-      border-color: #6366f1 !important;
+      border-color: var(--kpit-lime) !important;
       border-top-width: 2px !important;
       border-bottom-width: 2px !important;
       border-left-width: 0 !important;
@@ -155,7 +130,7 @@
     }
 
     .mdc-notched-outline__trailing {
-      border-color: #6366f1 !important;
+      border-color: var(--kpit-lime) !important;
       border-top-width: 2px !important;
       border-bottom-width: 2px !important;
       border-right-width: 2px !important;
@@ -163,11 +138,11 @@
     }
 
     .mat-mdc-form-field-icon-prefix {
-      color: #6366f1 !important;
+      color: var(--kpit-lime) !important;
     }
 
     .mdc-floating-label {
-      color: #6366f1 !important;
+      color: var(--kpit-lime) !important;
     }
   }
 
@@ -176,24 +151,24 @@
    */
   &.mat-form-field-invalid {
     .mdc-notched-outline__leading {
-      border-color: #f44336 !important;
+      border-color: var(--vex-warn) !important;
       border-right-width: 0 !important;
       border-right-style: none !important;
     }
 
     .mdc-notched-outline__notch {
-      border-color: #f44336 !important;
+      border-color: var(--vex-warn) !important;
       border-left-width: 0 !important;
       border-right-width: 0 !important;
     }
 
     .mdc-notched-outline__trailing {
-      border-color: #f44336 !important;
+      border-color: var(--vex-warn) !important;
     }
 
     /* Icône reste grise (plus pro que rouge) — style VEX */
     .mat-mdc-form-field-icon-prefix {
-      color: #9ca3af !important;
+      color: var(--vex-text-hint) !important;
     }
 
     &.mat-focused {
@@ -227,19 +202,19 @@
 .vex-select-panel.mat-mdc-select-panel,
 .vex-select-panel {
   border-radius: 12px !important;
-  border: 1px solid #e5e7eb !important;
+  border: 1px solid var(--vex-border) !important;
   box-shadow:
-    0 10px 15px -3px rgba(0, 0, 0, 0.08),
-    0 4px 6px -4px rgba(0, 0, 0, 0.06) !important;
+    0 10px 15px -3px rgba(0, 0, 0, 0.5),
+    0 4px 6px -4px rgba(0, 0, 0, 0.4) !important;
   padding: 6px !important;
   min-width: 220px !important;
   max-height: 280px !important;
-  background: #ffffff !important;
+  background: var(--vex-card) !important;
   margin-top: 4px;
 
   /* Scrollbar fine et discrète */
   scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
+  scrollbar-color: var(--vex-border-strong) transparent;
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -251,12 +226,12 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: var(--vex-border-strong);
     border-radius: 9999px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
+    background: var(--vex-text-hint);
   }
 
   /* Option */
@@ -266,39 +241,39 @@
     margin: 2px 0 !important;
     padding: 0 12px !important;
     font-size: 14px !important;
-    color: #111827 !important;
+    color: var(--vex-text) !important;
     transition: background-color 0.15s ease;
 
     /* Hover */
     &:hover:not(.mdc-list-item--disabled) {
-      background-color: #f3f4f6 !important;
+      background-color: var(--vex-surface-2) !important;
     }
 
     /* Focus clavier */
     &.mat-mdc-option-active {
-      background-color: #f3f4f6 !important;
+      background-color: var(--vex-surface-2) !important;
     }
 
     /* Sélectionné (multi) */
     &.mdc-list-item--selected:not(.mdc-list-item--disabled) {
-      background-color: rgba(99, 102, 241, 0.08) !important;
+      background-color: var(--vex-primary-soft) !important;
 
       .mdc-list-item__primary-text {
-        color: #4f46e5 !important;
+        color: var(--kpit-lime) !important;
         font-weight: 500;
       }
     }
 
     /* Checkbox Material à l’intérieur de l’option */
     .mdc-checkbox {
-      --mdc-checkbox-selected-checkmark-color: #ffffff;
-      --mdc-checkbox-selected-focus-icon-color: #6366f1;
-      --mdc-checkbox-selected-hover-icon-color: #6366f1;
-      --mdc-checkbox-selected-icon-color: #6366f1;
-      --mdc-checkbox-selected-pressed-icon-color: #4f46e5;
-      --mdc-checkbox-unselected-icon-color: #9ca3af;
-      --mdc-checkbox-unselected-hover-icon-color: #6b7280;
-      --mdc-checkbox-unselected-focus-icon-color: #6b7280;
+      --mdc-checkbox-selected-checkmark-color: var(--kpit-ink);
+      --mdc-checkbox-selected-focus-icon-color: var(--kpit-lime);
+      --mdc-checkbox-selected-hover-icon-color: var(--kpit-lime);
+      --mdc-checkbox-selected-icon-color: var(--kpit-lime);
+      --mdc-checkbox-selected-pressed-icon-color: var(--kpit-lime);
+      --mdc-checkbox-unselected-icon-color: var(--vex-text-hint);
+      --mdc-checkbox-unselected-hover-icon-color: var(--vex-text-secondary);
+      --mdc-checkbox-unselected-focus-icon-color: var(--vex-text-secondary);
     }
 
     .mdc-checkbox .mdc-checkbox__background {
@@ -312,7 +287,7 @@
     font-weight: 600 !important;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: #9ca3af !important;
+    color: var(--vex-text-hint) !important;
     min-height: 32px !important;
   }
 }

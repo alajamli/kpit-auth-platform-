@@ -1,12 +1,12 @@
 .user-management-container {
   padding: 2rem;
-  background-color: #f8fafc;
+  background-color: var(--vex-background);
   min-height: calc(100vh - 64px);
 }
 
 .page-card {
   border-radius: 12px;
-  background: #ffffff;
+  background: var(--vex-card);
   padding: 1.5rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
@@ -26,8 +26,8 @@
       width: 48px;
       height: 48px;
       border-radius: 10px;
-      background: #eef2ff;
-      color: #3730a3;
+      background: var(--vex-primary-soft);
+      color: var(--vex-primary);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -43,19 +43,19 @@
       margin: 0;
       font-size: 1.25rem;
       font-weight: 700;
-      color: #1e293b;
+      color: var(--vex-text);
     }
 
     p {
       margin: 0;
       font-size: 0.875rem;
-      color: #64748b;
+      color: var(--vex-text-secondary);
     }
   }
 
   .add-user-btn {
-    background-color: #3730a3 !important;
-    color: #ffffff !important;
+    background-color: var(--vex-primary-700) !important;
+    color: var(--vex-on-primary) !important;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -63,8 +63,8 @@
 }
 
 .create-user-panel {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--vex-background);
+  border: 1px solid var(--vex-border);
   border-radius: 10px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
@@ -73,7 +73,7 @@
     margin: 0 0 1rem 0;
     font-size: 1rem;
     font-weight: 600;
-    color: #3730a3;
+    color: var(--vex-primary);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -94,8 +94,8 @@
       justify-content: flex-end;
 
       button {
-        background-color: #3730a3 !important;
-        color: #ffffff !important;
+        background-color: var(--vex-primary-700) !important;
+        color: var(--vex-on-primary) !important;
       }
     }
   }
@@ -111,33 +111,33 @@
   border-collapse: collapse;
 
   th {
-    color: #475569;
+    color: var(--vex-text-secondary);
     font-weight: 600;
     font-size: 0.8125rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    background: #f8fafc;
+    background: var(--vex-background);
     padding: 12px 16px;
   }
 
   td {
     padding: 12px 16px;
-    color: #334155;
+    color: var(--vex-text);
     font-size: 0.875rem;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--vex-border);
   }
 }
 
 .user-fullname {
   font-weight: 600;
-  color: #0f172a;
+  color: var(--vex-text);
 }
 
 .username-tag {
-  background: #f1f5f9;
+  background: var(--vex-surface-2);
   padding: 4px 8px;
   border-radius: 6px;
-  color: #475569;
+  color: var(--vex-text-secondary);
   font-family: monospace;
 }
 
@@ -150,23 +150,23 @@
   letter-spacing: 0.03em;
 
   &.badge-admin {
-    background: #fee2e2;
-    color: #991b1b;
+    background: var(--vex-danger-soft);
+    color: var(--vex-warn);
   }
 
   &.badge-tester {
-    background: #e0e7ff;
-    color: #3730a3;
+    background: var(--vex-primary-soft);
+    color: var(--vex-primary);
   }
 
   &.badge-auditor {
-    background: #fef3c7;
-    color: #92400e;
+    background: var(--vex-warning-soft);
+    color: var(--vex-primary);
   }
 
   &.badge-viewer {
-    background: #f1f5f9;
-    color: #475569;
+    background: var(--vex-surface-2);
+    color: var(--vex-text-secondary);
   }
 }
 
@@ -184,12 +184,12 @@
   letter-spacing: 0.03em;
 
   &.badge-active {
-    background: #dcfce7;
-    color: #15803d;
+    background: var(--vex-success-soft);
+    color: var(--vex-success);
   }
 
   &.badge-disabled {
-    background: #fee2e2;
-    color: #b91c1c;
+    background: var(--vex-danger-soft);
+    color: var(--vex-warn);
   }
 }

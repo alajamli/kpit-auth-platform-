@@ -1,0 +1,173 @@
+/* =========================================================
+   KPIT DESIGN SYSTEM — Dark theme (Pentagram identity)
+   Les noms --vex-* sont conservés : tous les composants les utilisent.
+   ========================================================= */
+
+:root,
+:root.kpit-dark {
+  color-scheme: dark;
+
+  /* --- Marque KPIT --- */
+  --kpit-lime: #a3e500;          /* Vivid Lime Green : accent principal */
+  --kpit-lime-bright: #7fff00;   /* Lime vif : halos / focus */
+  --kpit-purple: #6c25be;        /* Electric Purple : accent secondaire */
+  --kpit-purple-light: #a77bec;  /* Violet lisible sur fond sombre (texte) */
+  --kpit-ink: #0b0f19;           /* Fond de base sombre */
+
+  /* --- Accent principal (lime) --- */
+  --vex-primary: var(--kpit-lime);
+  --vex-primary-600: #b8f21a;        /* hover : plus lumineux */
+  --vex-primary-700: var(--kpit-lime);
+  --vex-primary-300: var(--kpit-lime-bright);
+  --vex-primary-soft: rgba(163, 229, 0, 0.12);
+  --vex-on-primary: var(--kpit-ink);  /* texte posé sur le lime */
+  --vex-focus-ring: 0 0 0 3px rgba(127, 255, 0, 0.35);
+
+  /* --- Accent secondaire (violet) --- */
+  --vex-secondary: var(--kpit-purple);
+  --vex-secondary-text: var(--kpit-purple-light);
+  --vex-secondary-soft: rgba(108, 37, 190, 0.22);
+
+  /* --- Statuts --- */
+  --vex-accent: var(--kpit-lime);
+  --vex-warn: #ff5c6c;
+  --vex-danger-soft: rgba(255, 92, 108, 0.14);
+  --vex-success: #3ddc97;
+  --vex-success-soft: rgba(61, 220, 151, 0.14);
+  --vex-warning: #ffb547;
+  --vex-warning-soft: rgba(255, 181, 71, 0.14);
+
+  /* --- Surfaces --- */
+  --vex-background: var(--kpit-ink);
+  --vex-card: #121826;
+  --vex-surface-2: #182033;
+  --vex-header-bg: rgba(11, 15, 25, 0.8);
+  --vex-border: #232d42;
+  --vex-border-strong: #33415c;
+
+  /* --- Texte --- */
+  --vex-text: #e8edf7;
+  --vex-text-secondary: #a3aec4;
+  --vex-text-hint: #6f7b94;
+  --vex-text-icon: #8b97b0;
+
+  /* --- Sidebar --- */
+  --vex-sidebar-bg: #070a12;
+  --vex-sidebar-item-color: #b4bdd0;
+  --vex-sidebar-item-hover: rgba(255, 255, 255, 0.06);
+  --vex-sidebar-item-active-bg: rgba(163, 229, 0, 0.12);
+  --vex-sidebar-subheading: rgba(139, 151, 176, 0.8);
+
+  /* --- Dimensions & mouvement --- */
+  --vex-sidebar-width: 280px;
+  --vex-sidebar-collapsed-width: 72px;
+  --vex-toolbar-height: 64px;
+  --vex-radius: 12px;
+  --vex-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* --- Variables Bootstrap --- */
+  --bs-body-bg: var(--vex-background);
+  --bs-body-color: var(--vex-text);
+  --bs-border-color: var(--vex-border);
+
+  /* --- Variables Angular Material (MDC) --- */
+  --mdc-dialog-container-color: var(--vex-card);
+  --mdc-dialog-subhead-color: var(--vex-text);
+  --mdc-dialog-supporting-text-color: var(--vex-text-secondary);
+  --mat-menu-container-color: var(--vex-card);
+  --mat-menu-item-label-text-color: var(--vex-text);
+  --mat-menu-item-icon-color: var(--vex-text-icon);
+  --mdc-elevated-card-container-color: var(--vex-card);
+  --mdc-outlined-card-container-color: var(--vex-card);
+  --mat-select-panel-background-color: var(--vex-card);
+  --mat-select-enabled-trigger-text-color: var(--vex-text);
+  --mat-select-enabled-arrow-color: var(--vex-text-icon);
+  --mat-option-label-text-color: var(--vex-text);
+  --mdc-filled-text-field-input-text-color: var(--vex-text);
+  --mdc-outlined-text-field-input-text-color: var(--vex-text);
+  --mdc-outlined-text-field-label-text-color: var(--vex-text-secondary);
+  --mdc-outlined-text-field-caret-color: var(--kpit-lime);
+  --mdc-outlined-text-field-focus-label-text-color: var(--kpit-lime);
+  --mdc-list-list-item-label-text-color: var(--vex-text);
+  --mat-tab-header-inactive-label-text-color: var(--vex-text-secondary);
+  --mat-tab-header-active-label-text-color: var(--kpit-lime);
+  --mat-tab-header-active-focus-label-text-color: var(--kpit-lime);
+  --mat-tab-header-active-hover-label-text-color: var(--kpit-lime);
+  --mdc-tab-indicator-active-indicator-color: var(--kpit-lime);
+  --mat-table-background-color: var(--vex-card);
+  --mat-table-header-headline-color: var(--vex-text-secondary);
+  --mat-table-row-item-label-text-color: var(--vex-text);
+  --mat-table-row-item-outline-color: var(--vex-border);
+  --mat-paginator-container-background-color: var(--vex-card);
+  --mat-paginator-container-text-color: var(--vex-text-secondary);
+  --mat-paginator-enabled-icon-color: var(--vex-text-secondary);
+  --mdc-checkbox-selected-icon-color: var(--kpit-lime);
+  --mdc-checkbox-selected-checkmark-color: var(--kpit-ink);
+  --mdc-checkbox-unselected-icon-color: var(--vex-text-hint);
+  --mat-divider-color: var(--vex-border);
+  --mdc-circular-progress-active-indicator-color: var(--kpit-lime);
+}
+
+/* ---------- Base globale ---------- */
+html,
+body {
+  background: var(--vex-background);
+  color: var(--vex-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--kpit-lime);
+  color: var(--kpit-ink);
+}
+
+/* Focus clavier : anneau lime */
+:focus-visible {
+  outline: 2px solid var(--kpit-lime-bright);
+  outline-offset: 2px;
+}
+
+/* Scrollbars discrètes */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--vex-border-strong) transparent;
+}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--vex-border-strong); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--vex-text-hint); }
+
+/* ---------- Micro-interactions ---------- */
+.mat-mdc-card,
+.mat-mdc-button-base,
+.mat-mdc-menu-item {
+  transition: transform 0.2s var(--vex-ease), box-shadow 0.2s var(--vex-ease),
+    background-color 0.2s var(--vex-ease), border-color 0.2s var(--vex-ease);
+}
+
+.mat-mdc-card {
+  border: 1px solid var(--vex-border);
+  background: var(--vex-card);
+  color: var(--vex-text);
+}
+
+.mat-mdc-unelevated-button.mat-primary,
+.mat-mdc-raised-button.mat-primary {
+  --mdc-filled-button-container-color: var(--kpit-lime);
+  --mdc-filled-button-label-text-color: var(--kpit-ink);
+  --mdc-protected-button-container-color: var(--kpit-lime);
+  --mdc-protected-button-label-text-color: var(--kpit-ink);
+
+  &:hover:not([disabled]) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(163, 229, 0, 0.28);
+  }
+}
+
+.mat-mdc-menu-panel,
+.mat-mdc-dialog-surface {
+  border: 1px solid var(--vex-border);
+}
+
+.cdk-overlay-dark-backdrop {
+  background: rgba(5, 8, 15, 0.7);
+}
