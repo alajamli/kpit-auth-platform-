@@ -10,17 +10,11 @@ from flask_restx import Api, Resource, Namespace
 
 from app.config import config
 from app.extensions import db, migrate, jwt, limiter
-import os
 
 
 def create_app(config_name='development'):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
-     # CRÉATION AUTOMATIQUE DES DOSSIERS DE TESTS ROBOT FRAMEWORK
-    os.makedirs('/robot_tests/suites', exist_ok=True)
-    os.makedirs(os.path.abspath(os.path.join(app.root_path, '..', 'robot_tests', 'suites')), exist_ok=True)
-    os.makedirs(os.path.abspath(os.path.join(app.root_path, '..', 'instance')), exist_ok=True)
-    os.makedirs(os.path.abspath(os.path.join(app.root_path, '..', 'reports')), exist_ok=True)
     
     # Initialiser les extensions
     db.init_app(app)
@@ -38,9 +32,7 @@ def create_app(config_name='development'):
     # Configuration CORS
     CORS(app, resources={
         r"/api/*": {
-            "origins": "*",
-            "allow_headers": ["Content-Type", "Authorization"],
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+            "origins": ["http://localhost:4200"]
         }
     })
     
@@ -93,7 +85,5 @@ def create_app(config_name='development'):
     # 4. Test Manager Namespace (/api/tests)
     from app.routes.test_manager import test_ns
     api.add_namespace(test_ns)
-
-    
     
     return app

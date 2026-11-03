@@ -64,27 +64,38 @@
           </div>
 
           <!-- Suite + Test name -->
-          <div class="ai-grid-2">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Target suite</mat-label>
-              <mat-select [(ngModel)]="aiTargetSuite" name="aiTargetSuite">
-                <mat-option *ngFor="let s of suites" [value]="s">{{ s }}</mat-option>
-                <mat-option value="NEW_SUITE">+ Create new suite</mat-option>
-              </mat-select>
-            </mat-form-field>
+          <!-- Suite + Test name -->
+<div class="ai-grid-2"[class.ai-grid-3]="aiTargetSuite === 'NEW_SUITE'">
+  <!-- Target suite (always visible) -->
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Target suite</mat-label>
+    <mat-select [(ngModel)]="aiTargetSuite" name="aiTargetSuite">
+      <mat-option *ngFor="let s of suites" [value]="s">{{ s }}</mat-option>
+      <mat-option value="NEW_SUITE">+ Create new suite</mat-option>
+    </mat-select>
+  </mat-form-field>
 
-            <mat-form-field appearance="outline" class="w-100" *ngIf="aiTargetSuite === 'NEW_SUITE'">
-              <mat-label>New suite filename (.robot)</mat-label>
-              <input matInput [(ngModel)]="customSuiteName" name="customSuiteName"
-                     placeholder="e.g. 03_ai_generated_tests.robot" />
-            </mat-form-field>
+  <!-- New suite filename (only when creating a new suite) -->
+  <mat-form-field appearance="outline" class="w-100" *ngIf="aiTargetSuite === 'NEW_SUITE'">
+    <mat-label>New suite filename (.robot)</mat-label>
+    <input
+      matInput
+      [(ngModel)]="customSuiteName"
+      name="customSuiteName"
+      placeholder="e.g. 04_ahmed_login_tests.robot" />
+  </mat-form-field>
 
-            <mat-form-field appearance="outline" class="w-100" *ngIf="aiTargetSuite !== 'NEW_SUITE'">
-              <mat-label>Test case name / ID</mat-label>
-              <input matInput [(ngModel)]="aiTestName" name="aiTestName"
-                     placeholder="e.g. TC-AI-01 Verification 2FA" />
-            </mat-form-field>
-          </div>
+  <!-- Test case name / ID — ALWAYS visible (existing suite OR new suite) -->
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Test case name / ID</mat-label>
+    <input
+      matInput
+      [(ngModel)]="aiTestName"
+      name="aiTestName"
+      placeholder="e.g. TC-AI-01 Verify Ahmed Login Success" />
+    
+  </mat-form-field>
+</div>
 
           <!-- Requirement -->
           <mat-form-field appearance="outline" class="w-100 ai-field">

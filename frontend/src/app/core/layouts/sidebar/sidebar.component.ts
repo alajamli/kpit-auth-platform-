@@ -1,3 +1,5 @@
+// src/app/core/components/sidebar/sidebar.component.ts
+
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
@@ -29,9 +31,7 @@ interface NavSection {
 })
 export class SidebarComponent {
 
-  
   @Input() collapsed = false;
-  /** Ouverture en mode tiroir (mobile) — piloté par le layout */
   @Input() mobileOpen = false;
 
   navigationSections: NavSection[] = [
@@ -56,14 +56,12 @@ export class SidebarComponent {
         {
           label: 'Test Reports',
           icon: 'analytics',
-          route: '',
-          badge: { text: 'SOON', color: 'slate' }
+          route: '/tests/reports'
         },
         {
           label: 'Test History',
           icon: 'history',
-          route: '',
-          badge: { text: 'SOON', color: 'slate' }
+          route: '/tests/history'
         }
       ]
     },
@@ -73,44 +71,48 @@ export class SidebarComponent {
         {
           label: 'Users',
           icon: 'people',
-          route: '/users',
-          
+          route: '/users'
         },
         {
           label: 'Settings',
           icon: 'settings',
-          route: '',
-          badge: { text: 'SOON', color: 'slate' }
+          route: '/settings'
         }
       ]
     }
   ];
 
-  constructor(private router: Router , private authService: AuthService) {
+  constructor(private router: Router, private authService: AuthService) {}
 
-  }
   get filteredSections(): NavSection[] {
-  const role = this.authService.getCurrentUser()?.role;
-  return this.navigationSections.map(section => ({
-    ...section,
-    items: section.items.filter(item => {
-      // Seuls les admins voient "Users"
-      if (item.route === '/users') {
-        return role === 'admin';
-      }
-      return true;
-    })
-  }));
-}
+    const role = this.authService.getCurrentUser()?.role;
+    return this.navigationSections.map(section => ({
+      ...section,
+      items: section.items.filter(item => {
+        if (item.route === '/users') {
+          return role === 'admin';
+        }
+        return true;
+      })
+    }));
+  }
 
-  navigateTo (item: NavItem): void {
+  navigateTo(item: NavItem): void {
     if (item.route) {
       this.router.navigate([item.route]);
     }
   }
 
+  /**
+   * FIX: Vérification exacte de l'URL pour éviter que /tests/reports
+   * ne déclenche l'état actif sur la route /tests.
+   */
   isRouteActive(route: string | undefined): boolean {
     if (!route) return false;
-    return this.router.url.startsWith(route);
+    
+    // Nettoie l'URL actuelle en retirant les paramètres de requête s'il y en a (ex: ?page=1)
+    const currentUrl = this.router.url.split('?')[0];
+    
+    return currentUrl === route;
   }
 }

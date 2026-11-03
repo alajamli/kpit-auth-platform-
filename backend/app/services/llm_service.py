@@ -190,12 +190,13 @@ class LLMService:
         return default_active_models
 
     @classmethod
+     
     def _sanitize_and_fix_robot_code(cls, code: str, target_suite: str = "03_ui_tests.robot", requirement: str = "", target_url: str = None) -> str:
         """
         POST-PROCESSEUR AUTOMATIQUE (GUARDRAIL) :
         1. Nettoie le Markdown.
         2. Assure la présence de [Documentation] et [Tags].
-        3. Corrige la syntaxe et les mots-clés pour la suite interne OU pour un site externe.
+        3. GARANTIT la présence de la section *** Test Cases *** pour que le parseur le détecte !
         """
         code = re.sub(r'```robotframework|```robot|```', '', code).strip()
         is_ui_suite = '03_ui' in target_suite or 'ui' in target_suite.lower()
@@ -214,7 +215,6 @@ class LLMService:
             if '[Documentation]' in line:
                 has_doc = True
 
-            # Pour les tests internes KPIT Auth Platform UI
             if is_ui_suite and not is_generic_external:
                 if any(stripped.startswith(cmd) for cmd in ["Open Browser", "Close Browser", "Maximize Browser Window", "[Teardown]  Close Browser", "[Teardown]    Close Browser"]):
                     continue
@@ -230,7 +230,6 @@ class LLMService:
 
             cleaned_lines.append(line)
 
-        # INJECTION AUTOMATIQUE DE TAGS ET DOCUMENTATION SI MANQUANTS
         final_lines = []
         default_tag = "ui" if is_ui_suite else "generic"
 
@@ -247,22 +246,19 @@ class LLMService:
 
         final_code = "\n".join(final_lines)
 
-        # Nettoyage spécifique aux tests internes
+        # -------------------------------------------------------------
+        # GUARDRAIL PARSEUR : S'assurer que *** Test Cases *** existe !
+        # -------------------------------------------------------------
+        if "*** Test Cases ***" not in final_code and "*** Test Case ***" not in final_code:
+            final_code = "*** Test Cases ***\n" + final_code
+
         if is_ui_suite and not is_generic_external:
             final_code = re.sub(
                 r'(Click Logout Button\n\s*Verify Redirected To Login)\n\s*Verify Welcome Page Is Displayed',
                 r'\1',
                 final_code
             )
-            if 'Verify Error Message Is Displayed' in final_code:
-                res_lines = []
-                for l in final_code.splitlines():
-                    if 'Verify Welcome Page Is Displayed' in l or 'Verify Welcome Message Contains' in l:
-                        continue
-                    res_lines.append(l)
-                final_code = "\n".join(res_lines)
 
-        # Forçage du mode Headless Chrome pour les tests externes cibles
         if is_generic_external and "Open Browser" in final_code and "headlesschrome" not in final_code.lower():
             final_code = re.sub(
                 r'(Open Browser\s+[^\s]+\s+)(\w+)',
@@ -437,3 +433,4 @@ class LLMService:
     Verify Welcome Page Is Displayed
     Verify Welcome Message Contains    Welcome back, {name_var}
 """
+llm_service = LLMService()

@@ -104,14 +104,35 @@ export class TestCaseDialogComponent implements OnInit {
   }
 
     generateWithAI(): void {
-    if (!this.aiRequirement || !this.aiRequirement.trim()) {
-      this.snackBar.open('Please enter a functional requirement.', 'Close', {
-        duration: 3000,
-        panelClass: ['snackbar-warning'],
-        horizontalPosition: 'right',
-        verticalPosition: 'top'
-      });
-      return;
+  if (!this.aiRequirement?.trim()) {
+    this.snackBar.open('Please enter a functional requirement.', 'Close', {
+      duration: 3000,
+      panelClass: ['snackbar-warning'],
+      horizontalPosition: 'right',
+      verticalPosition: 'top'
+    });
+    return;
+  }
+
+  if (this.aiTargetSuite === 'NEW_SUITE' && !this.customSuiteName?.trim()) {
+    this.snackBar.open('Please enter a new suite filename.', 'Close', {
+      duration: 3000,
+      panelClass: ['snackbar-warning'],
+      horizontalPosition: 'right',
+      verticalPosition: 'top'
+    });
+    return;
+  }
+
+  if (!this.aiTestName?.trim()) {
+    this.snackBar.open('Please enter a test case name / ID.', 'Close', {
+      duration: 3000,
+      panelClass: ['snackbar-warning'],
+      horizontalPosition: 'right',
+      verticalPosition: 'top'
+    });
+    return;
+  
     }
 
     this.isGenerating = true;
@@ -212,13 +233,14 @@ export class TestCaseDialogComponent implements OnInit {
   }
 
     clearAI(): void {
-    this.aiRequirement = '';
-    this.targetUrl = '';
-    this.testData = '';
-    this.generatedCode = '';
-    this.aiProvider = 'groq';
-    this.isGenerating = false;
-  }
+  this.aiRequirement = '';
+  this.aiTestName = 'TC-AI-01 Test Case';
+  this.targetUrl = '';
+  this.testData = '';
+  this.generatedCode = '';
+  this.aiProvider = 'groq';
+  this.isGenerating = false;
+}
 
   copyCode(): void {
     if (!this.generatedCode) return;

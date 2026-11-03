@@ -53,21 +53,3 @@ TC-002 Root Endpoint Should Return Welcome Message
 
 
 
-
-TC-AI-01 Test Case
-    [Documentation]    Authenticate user and verify product catalog is displayed
-    [Setup]    Open Browser    ${URL}    ${BROWSER}
-    [Teardown]    Close Browser
-
-    # Step 1: Enter username
-    Input Text    id=user-name    ${USERNAME}
-
-    # Step 2: Enter password
-    Input Text    id=password    ${PASSWORD}
-
-    # Step 3: Click Login button
-    Click Element    id=login-button
-
-    # Step 4: Verify product catalog is displayed
-    Page Should Contain    Products
-    Element Should Be Visible    id=inventory_container

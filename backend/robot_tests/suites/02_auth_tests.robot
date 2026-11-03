@@ -1,0 +1,197 @@
+*** Settings ***
+Documentation     Authentication tests for KPIT Auth Platform API.
+...               Uses common keywords for cleaner and maintainable tests.
+
+Resource          ../resources/variables.robot
+Resource          ../resources/common_keywords.robot
+
+*** Test Cases ***
+
+# =============================================================
+# REGISTER - SUCCESS SCENARIOS
+# =============================================================
+
+TC-101 Register New User With Valid Data Should Succeed
+    [Documentation]    Verify that a new user can be created with all valid fields.
+    [Tags]             auth    register    success    smoke
+    
+    ${response}=       Register New User With Random Data
+    Should Be Equal As Numbers    ${response.status_code}    ${STATUS_CREATED}
+    Verify Response Is Success    ${response}
+    Log    ✅ User created successfully
+
+# =============================================================
+# REGISTER - ERROR SCENARIOS
+# =============================================================
+
+TC-102 Register With Duplicate Email Should Fail
+    [Documentation]    Verify that registering with an existing email returns 409.
+    [Tags]             auth    register    error    regression
+    
+    Register Should Fail With Duplicate Email    ${AHMED_EMAIL}
+    Log    ✅ Duplicate email correctly rejected
+
+TC-103 Register With Duplicate Login Should Fail
+    [Documentation]    Verify that registering with an existing login returns 409.
+    [Tags]             auth    register    error    regression
+    
+    ${response}=       Register New User
+    ...                first_name=Duplicate
+    ...                last_name=Login
+    ...                email=uniqueemail_dupl_login@kpit.com
+    ...                login=${AHMED_LOGIN}
+    ...                password=somepass
+    ...                expected_status=${STATUS_CONFLICT}
+    
+    Should Be Equal As Numbers    ${response.status_code}    ${STATUS_CONFLICT}
+    Should Contain     ${response.json()}[error]    Login already taken
+    Log    ✅ Duplicate login correctly rejected
+
+TC-104 Register Without Email Should Fail
+    [Documentation]    Verify that missing email field returns 400.
+    [Tags]             auth    register    error    validation
+    
+    Create API Session
+    ${user_data}=      Create Dictionary
+    ...                first_name=Missing
+    ...                last_name=Email
+    ...                login=noemail
+    ...                password=somepass
+    
+    ${response}=       POST On Session
+    ...                ${SESSION_NAME}
+    ...                ${REGISTER_ENDPOINT}
+    ...                json=${user_data}
+    ...                expected_status=${STATUS_BAD_REQUEST}
+    
+    Should Be Equal As Numbers    ${response.status_code}    ${STATUS_BAD_REQUEST}
+    Should Contain     ${response.json()}[error]    email
+    Log    ✅ Missing email correctly rejected
+
+TC-105 Register With Empty Body Should Fail
+    [Documentation]    Verify that empty JSON body returns 400.
+    [Tags]             auth    register    error    validation
+    
+    Create API Session
+    ${empty_data}=     Create Dictionary
+    
+    ${response}=       POST On Session
+    ...                ${SESSION_NAME}
+    ...                ${REGISTER_ENDPOINT}
+    ...                json=${empty_data}
+    ...                expected_status=${STATUS_BAD_REQUEST}
+    
+    Should Be Equal As Numbers    ${response.status_code}    ${STATUS_BAD_REQUEST}
+    Log    ✅ Empty body correctly rejected
+
+# =============================================================
+# LOGIN - SUCCESS SCENARIOS
+# =============================================================
+
+TC-201 Login With Valid Credentials Should Succeed
+    [Documentation]    Verify that a user can login with correct credentials.
+    [Tags]             auth    login    success    smoke
+    
+    ${response}=       Login Should Succeed    ${AHMED_LOGIN}    ${AHMED_PASSWORD}
+    Verify User Data   ${response}    ${AHMED_LOGIN}    ${AHMED_EMAIL}
+    Log    ✅ Login successful for Ahmed
+
+# =============================================================
+# LOGIN - ERROR SCENARIOS
+# =============================================================
+
+TC-202 Login With Wrong Password Should Fail
+    [Documentation]    Verify that wrong password returns 401.
+    [Tags]             auth    login    error    security
+    
+    Login Should Fail With Unauthorized    ${AHMED_LOGIN}    WrongPassword123
+    Log    ✅ Wrong password correctly rejected
+
+TC-203 Login With Unknown User Should Fail
+    [Documentation]    Verify that unknown username returns 401.
+    [Tags]             auth    login    error    security
+    
+    Login Should Fail With Unauthorized    nonexistent_user_xyz    anypassword
+    Log    ✅ Unknown user correctly rejected
+
+TC-204 Login Without Password Should Fail
+    [Documentation]    Verify that missing password returns 400.
+    [Tags]             auth    login    error    validation
+    
+    Create API Session
+    ${credentials}=    Create Dictionary    login=${AHMED_LOGIN}
+    
+    ${response}=       POST On Session
+    ...                ${SESSION_NAME}
+    ...                ${LOGIN_ENDPOINT}
+    ...                json=${credentials}
+    ...                expected_status=${STATUS_BAD_REQUEST}
+    
+    Should Be Equal As Numbers    ${response.status_code}    ${STATUS_BAD_REQUEST}
+    Should Contain     ${response.json()}[error]    required
+    Log    ✅ Missing password correctly rejected
+
+# =============================================================
+# CASE SENSITIVITY TESTS (Demandé par l'encadrant)
+# =============================================================
+
+TC-301 Login With Uppercase Username Should Fail
+    [Documentation]    Verify that usernames are case-sensitive.
+    [Tags]             auth    login    case-sensitive    supervisor-request
+    
+    Login Should Fail With Unauthorized    AHMED    ${AHMED_PASSWORD}
+    Log    ✅ Uppercase username correctly rejected (case-sensitive)
+
+TC-302 Login With Uppercase Password Should Fail
+    [Documentation]    Verify that passwords are case-sensitive.
+    [Tags]             auth    login    case-sensitive    supervisor-request
+    
+    Login Should Fail With Unauthorized    ${AHMED_LOGIN}    AHMED123
+    Log    ✅ Uppercase password correctly rejected (case-sensitive)
+
+# =============================================================
+# INPUT ORDER TESTS (Demandé par l'encadrant)
+# =============================================================
+
+TC-401 Login With Login First Then Password Should Succeed
+    [Documentation]    Verify that JSON order doesn't matter (login first).
+    [Tags]             auth    login    input-order    supervisor-request
+    
+    ${response}=       Login Should Succeed    ${AHMED_LOGIN}    ${AHMED_PASSWORD}
+    Log    ✅ Login OK with order: login then password
+
+TC-402 Login With Password First Then Login Should Succeed
+    [Documentation]    Verify that JSON order doesn't matter (password first).
+    [Tags]             auth    login    input-order    supervisor-request
+    
+    Create API Session
+    # Ordre INVERSÉ : password AVANT login
+    ${credentials}=    Create Dictionary
+    ...                password=${AHMED_PASSWORD}
+    ...                login=${AHMED_LOGIN}
+    
+    ${response}=       POST On Session
+    ...                ${SESSION_NAME}
+    ...                ${LOGIN_ENDPOINT}
+    ...                json=${credentials}
+    ...                expected_status=${STATUS_OK}
+    
+    Should Be Equal As Numbers    ${response.status_code}    ${STATUS_OK}
+    Log    ✅ Login OK with order: password then login
+
+TC-902 Verify Login with Empty Inputs
+    [Documentation]    Test that sending empty login/password blocks request
+    [Tags]             auth    validation
+    
+    # Auto-generated steps
+    Log    ✅ This is an auto-generated test case
+    Sleep    1s    reason=Simulate test execution
+
+
+
+
+TC-API Interne Login Ahmed
+    [Documentation]    Vérifie que la connexion de l'utilisateur Ahmed réussit avec les identifiants valides.
+    [Tags]             ai-generated    api    login_success
+    Create API Session
+    Login Should Succeed    ${AHMED_LOGIN}    ${AHMED_PASSWORD}

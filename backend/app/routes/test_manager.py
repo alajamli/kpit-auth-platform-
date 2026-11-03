@@ -16,6 +16,7 @@ from app.services.async_robot_runner import get_async_runner
 from app.services.robot_file_manager import get_file_manager
 from app.utils.decorators import roles_required
 import logging
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 test_ns = Namespace(
@@ -387,3 +388,161 @@ class SaveGeneratedTestScript(Resource):
             }, 201
         except Exception as e:
             return {'message': f'Erreur d\'écriture fichier: {str(e)}'}, 500
+
+def _results_root() -> Path:
+    if os.path.exists('/app/robot_tests/results'):
+        return Path('/app/robot_tests/results')
+    # local: backend/app/routes → ../../../robot_tests/results
+    current = Path(__file__).resolve().parent
+    project_root = current.parent.parent.parent
+    return project_root / 'robot_tests' / 'results'
+
+
+@test_ns.route('/history')
+class TestHistory(Resource):
+    @jwt_required()
+    @test_ns.doc(security='Bearer')
+    def get(self):
+        """Liste les jobs d'exécution (mémoire process) du plus récent au plus ancien."""
+        runner = get_async_runner()
+        jobs = []
+        with runner.jobs_lock:
+            for job in runner.jobs.values():
+                jobs.append({
+                    'id': job.get('id'),
+                    'status': job.get('status'),
+                    'started_at': job.get('started_at'),
+                    'ended_at': job.get('ended_at'),
+                    'total': job.get('total', 0),
+                    'completed': job.get('completed', 0),
+                    'passed': job.get('passed', 0),
+                    'failed': job.get('failed', 0),
+                    'error': job.get('error'),
+                    'report_available': job.get('report_available', False),
+                    'tests': job.get('tests', [])[-20:],  # aperçu
+                })
+        jobs.sort(key=lambda j: j.get('started_at') or '', reverse=True)
+        return {'success': True, 'history': jobs}, 200
+
+
+@test_ns.route('/history/<string:job_id>')
+class TestHistoryDetail(Resource):
+    @jwt_required()
+    @test_ns.doc(security='Bearer')
+    def get(self, job_id):
+        runner = get_async_runner()
+        job = runner.get_job_status(job_id)
+        if not job:
+            return {'success': False, 'message': 'Job not found'}, 404
+        return {'success': True, 'job': job}, 200
+
+
+@test_ns.route('/reports')
+class TestReportsList(Resource):
+    @jwt_required()
+    @test_ns.doc(security='Bearer')
+    def get(self):
+        """Scanne robot_tests/results pour lister les rapports report.html / log.html."""
+        try:
+            root = _results_root()
+            reports = []
+
+            # 1. Rapports à la racine de results/
+            for name in ('report.html', 'log.html', 'output.xml'):
+                p = root / name
+                if p.exists():
+                    reports.append({
+                        'id': f'root-{name}',
+                        'name': name,
+                        'folder': 'latest',
+                        'path': str(p),
+                        'size_kb': round(p.stat().st_size / 1024, 1),
+                        'modified_at': p.stat().st_mtime,
+                        'type': name.split('.')[-1],
+                        'has_log': (root / 'log.html').exists()
+                    })
+
+            # 2. Rapports dans les sous-dossiers (job_id)
+            if root.exists():
+                for folder in sorted(root.iterdir(), reverse=True):
+                    if not folder.is_dir():
+                        continue
+                    report_html = folder / 'report.html'
+                    if report_html.exists():
+                        reports.append({
+                            'id': folder.name,
+                            'name': 'report.html',
+                            'folder': folder.name,
+                            'path': str(report_html),
+                            'size_kb': round(report_html.stat().st_size / 1024, 1),
+                            'modified_at': report_html.stat().st_mtime,
+                            'type': 'html',
+                            'has_log': (folder / 'log.html').exists()
+                        })
+
+            return {'success': True, 'reports': reports}, 200
+
+        except Exception as e:
+            logger.exception("Error scanning reports directory")
+            return {'success': False, 'message': f'Failed to scan reports: {str(e)}'}, 500
+
+@test_ns.route('/reports/file/<path:subpath>')
+class TestReportFile(Resource):
+    @jwt_required()
+    @test_ns.doc(security='Bearer')
+    def get(self, subpath):
+        """Sert un fichier de rapport de façon sécurisée (pas de path traversal)."""
+        root = _results_root().resolve()
+        target = (root / subpath).resolve()
+        if not str(target).startswith(str(root)) or not target.exists():
+            return {'success': False, 'message': 'Report file not found'}, 404
+        return send_from_directory(target.parent, target.name)     
+
+
+from flask import send_file
+from io import BytesIO
+from app.services.pdf_report_service import pdf_report_service
+
+def _results_root() -> Path:
+    """
+    Retourne de manière ultra-sécurisée le chemin absolu du dossier robot_tests/results.
+    Détecte automatiquement Docker (/app/robot_tests/results) ou Windows local.
+    """
+    docker_results = Path('/app/robot_tests/results')
+    if docker_results.exists():
+        return docker_results
+
+    # Localement : remonter depuis backend/app/routes jusqu'à la racine du projet
+    current_file = Path(__file__).resolve()
+    # current_file.parents[3] pointe vers la racine du projet 'kpit-auth-platform-'
+    project_root = current_file.parents[3]
+    local_results = project_root / 'robot_tests' / 'results'
+    
+    # Créer le dossier s'il n'existe pas encore
+    local_results.mkdir(parents=True, exist_ok=True)
+    return local_results
+
+
+@test_ns.route('/reports/pdf/<string:folder>')
+class TestReportPdf(Resource):
+    @jwt_required()
+    @test_ns.doc(security='Bearer')
+    def get(self, folder):
+        """
+        Generate a professional KPIT PDF report from Robot output.xml.
+        folder = 'latest' or a job_id subfolder name.
+        """
+        try:
+            root = _results_root()
+            pdf_bytes = pdf_report_service.generate_from_folder(root, folder)
+            filename = f"KPIT_Test_Report_{folder}.pdf"
+            return send_file(
+                BytesIO(pdf_bytes),
+                mimetype='application/pdf',
+                as_attachment=True,
+                download_name=filename
+            )
+        except FileNotFoundError as e:
+            return {'success': False, 'message': str(e)}, 404
+        except Exception as e:
+            return {'success': False, 'message': f'PDF generation failed: {str(e)}'}, 500           

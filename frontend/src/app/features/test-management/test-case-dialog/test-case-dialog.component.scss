@@ -355,3 +355,19 @@
     grid-template-columns: 1fr;
   }
 }
+.ai-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.ai-grid-2.ai-grid-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+@media (max-width: 900px) {
+  .ai-grid-2,
+  .ai-grid-2.ai-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}

@@ -131,5 +131,24 @@ saveGeneratedTest(filename: string, content: string): Observable<{ message: stri
     { filename, content }
   );
 }
+getTestHistory(): Observable<any> {
+  return this.http.get(`${this.apiUrl}/history`);
+}
+
+getTestHistoryDetail(jobId: string): Observable<any> {
+  return this.http.get(`${this.apiUrl}/history/${jobId}`);
+}
+
+getTestReports(): Observable<any> {
+  return this.http.get(`${this.apiUrl}/reports`);
+}
+
+getReportFileUrl(folder: string, fileName: string = 'report.html'): string {
+  const sub = folder === 'latest' ? fileName : `${folder}/${fileName}`;
+  return `${this.apiUrl}/reports/file/${sub}`;
+}
+getReportPdfUrl(folder: string): string {
+  return `${this.apiUrl}/reports/pdf/${encodeURIComponent(folder)}`;
+}
 
 }

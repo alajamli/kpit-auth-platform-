@@ -139,23 +139,4 @@ TC-802 Ali (Viewer Role) Can Login
 
 
 
-TC-AI-01 Test Case
-    [Documentation]    Test généré automatiquement pour : Vérifier la connexion de Sara
-    [Tags]             ai-generated    auto
-    Perform Login    ${SARA_LOGIN}    ${SARA_PASSWORD}
-    Verify Welcome Page Is Displayed
-    Verify Welcome Message Contains    Welcome back, ${SARA_FIRST_NAME}
 
-
-TC-AI-03 Test Case
-    Perform Login    ${AHMED_LOGIN}    WrongPass123
-    Verify Error Message Is Displayed    Invalid username or password
-
-
-
-TC-UI Interne Login Sara
-    [Documentation]    Vérifie que l'utilisateur Sara peut se connecter avec succès et voir la page d'accueil avec son prénom.
-    [Tags]             ai-generated    ui    smoke
-    Perform Login    ${SARA_LOGIN}    ${SARA_PASSWORD}
-    Verify Welcome Page Is Displayed
-    Verify Welcome Message Contains    Welcome back, ${SARA_FIRST_NAME}

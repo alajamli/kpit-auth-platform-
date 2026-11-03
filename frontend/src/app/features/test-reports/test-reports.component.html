@@ -1,0 +1,97 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Test Reports</h1>
+      <p class="page-subtitle">HTML execution reports and detailed Robot Framework logs</p>
+    </div>
+    <button mat-stroked-button type="button" (click)="loadReports()" [disabled]="loading">
+      <mat-icon>refresh</mat-icon>
+      Refresh
+    </button>
+  </div>
+
+  <div class="content-card" *ngIf="!loading">
+    <table mat-table [dataSource]="reports" class="vex-table" *ngIf="reports.length; else emptyReports">
+      
+      <ng-container matColumnDef="folder">
+        <th mat-header-cell *matHeaderCellDef>Job ID / Location</th>
+        <td mat-cell *matCellDef="let row">
+          <span class="folder-chip" [class.folder-root]="row.folder === 'latest'">
+            <mat-icon class="folder-icon">folder_open</mat-icon>
+            {{ row.folder === 'latest' ? 'Root (Latest)' : row.folder }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Main File</th>
+        <td mat-cell *matCellDef="let row">
+          <strong>{{ row.name }}</strong>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="size_kb">
+        <th mat-header-cell *matHeaderCellDef>Size</th>
+        <td mat-cell *matCellDef="let row">{{ row.size_kb }} KB</td>
+      </ng-container>
+
+      <ng-container matColumnDef="modified_at">
+        <th mat-header-cell *matHeaderCellDef>Generated On</th>
+        <td mat-cell *matCellDef="let row">{{ row.modified_at * 1000 | date:'medium' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+  <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+  <td mat-cell *matCellDef="let row" class="actions-cell">
+    <!-- Primary: professional PDF -->
+    <button
+      mat-flat-button
+      color="primary"
+      class="action-btn"
+      type="button"
+      (click)="downloadPdf(row)"
+      matTooltip="Download professional KPIT PDF report">
+      <mat-icon>picture_as_pdf</mat-icon>
+      PDF Report
+    </button>
+
+    <!-- Secondary: raw Robot HTML -->
+    <button
+      mat-stroked-button
+      class="action-btn"
+      type="button"
+      (click)="downloadReport(row, 'report')"
+      matTooltip="Download raw Robot Framework HTML report">
+      <mat-icon>html</mat-icon>
+      HTML
+    </button>
+
+    <button
+      *ngIf="row.has_log || row.name === 'log.html'"
+      mat-stroked-button
+      class="action-btn log-btn"
+      type="button"
+      (click)="downloadReport(row, 'log')"
+      matTooltip="Download detailed Robot log">
+      <mat-icon>subject</mat-icon>
+      Log
+    </button>
+  </td>
+</ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    <ng-template #emptyReports>
+      <div class="empty-state">
+        <mat-icon>find_in_page</mat-icon>
+        <p>No test reports found. Execute a test suite to generate Robot Framework reports.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <div class="loading-wrap" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+</div>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.2 (Python 3.11.18 on linux)" generated="2026-11-03T02:34:04.614270" rpa="false" schemaversion="5">
+<suite id="s1" name="01 Health Tests" source="/app/robot_tests/suites/01_health_tests.robot">
+<test id="s1-t1" name="TC-001 API Health Check Should Return Healthy Status" line="15">
+<kw name="Create Session">
+<msg time="2026-11-03T02:34:04.663598" level="FAIL">No keyword with name 'Create Session' found.</msg>
+<arg>kpit_api</arg>
+<arg>${BASE_URL}</arg>
+<status status="FAIL" start="2026-11-03T02:34:04.663560" elapsed="0.000124">No keyword with name 'Create Session' found.</status>
+</kw>
+<kw name="GET On Session">
+<var>${response}</var>
+<arg>kpit_api</arg>
+<arg>/health</arg>
+<status status="NOT RUN" start="2026-11-03T02:34:04.663817" elapsed="0.000016"/>
+</kw>
+<kw name="Should Be Equal As Numbers" owner="BuiltIn">
+<arg>${response.status_code}</arg>
+<arg>200</arg>
+<doc>Fails if objects are unequal after converting them to real numbers.</doc>
+<status status="NOT RUN" start="2026-11-03T02:34:04.663909" elapsed="0.000048"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<var>${json}</var>
+<arg>${response.json()}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="NOT RUN" start="2026-11-03T02:34:04.664092" elapsed="0.000015"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${json}[status]</arg>
+<arg>healthy</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="NOT RUN" start="2026-11-03T02:34:04.664170" elapsed="0.000014"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${json}[message]</arg>
+<arg>KPIT Auth Platform API</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="NOT RUN" start="2026-11-03T02:34:04.664240" elapsed="0.000013"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>✅ API is healthy and responding correctly</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2026-11-03T02:34:04.664305" elapsed="0.000011"/>
+</kw>
+<doc>Verify that the health endpoint returns a 200 status
+and confirms the API is running properly.</doc>
+<tag>api</tag>
+<tag>health</tag>
+<tag>smoke</tag>
+<status status="FAIL" start="2026-11-03T02:34:04.662215" elapsed="0.002201">No keyword with name 'Create Session' found.</status>
+</test>
+<test id="s1-t2" name="TC-002 Root Endpoint Should Return Welcome Message" line="38">
+<kw name="Create Session">
+<msg time="2026-11-03T02:34:04.665481" level="FAIL">No keyword with name 'Create Session' found.</msg>
+<arg>kpit_api_root</arg>
+<arg>http://localhost:5000</arg>
+<status status="FAIL" start="2026-11-03T02:34:04.665454" elapsed="0.000055">No keyword with name 'Create Session' found.</status>
+</kw>
+<kw name="GET On Session">
+<var>${response}</var>
+<arg>kpit_api_root</arg>
+<arg>/docs</arg>
+<status status="NOT RUN" start="2026-11-03T02:34:04.665589" elapsed="0.000013"/>
+</kw>
+<kw name="Should Be Equal As Numbers" owner="BuiltIn">
+<arg>${response.status_code}</arg>
+<arg>200</arg>
+<doc>Fails if objects are unequal after converting them to real numbers.</doc>
+<status status="NOT RUN" start="2026-11-03T02:34:04.665684" elapsed="0.000017"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>✅ Root/Docs endpoint is accessible</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2026-11-03T02:34:04.665764" elapsed="0.000016"/>
+</kw>
+<doc>Verify that the root endpoint returns a welcome message
+and confirms the API version.</doc>
+<tag>api</tag>
+<tag>health</tag>
+<status status="FAIL" start="2026-11-03T02:34:04.664596" elapsed="0.001270">No keyword with name 'Create Session' found.</status>
+</test>
+<test id="s1-t3" name="TC-AI-01 Test Case" line="57">
+<kw name="Open Browser" type="SETUP">
+<msg time="2026-11-03T02:34:04.666764" level="FAIL">No keyword with name 'Open Browser' found.</msg>
+<arg>${URL}</arg>
+<arg>${BROWSER}</arg>
+<status status="FAIL" start="2026-11-03T02:34:04.666741" elapsed="0.000051">No keyword with name 'Open Browser' found.</status>
+</kw>
+<kw name="Close Browser" type="TEARDOWN">
+<msg time="2026-11-03T02:34:04.667476" level="FAIL">No keyword with name 'Close Browser' found.</msg>
+<status status="FAIL" start="2026-11-03T02:34:04.667455" elapsed="0.000047">No keyword with name 'Close Browser' found.</status>
+</kw>
+<doc>Authenticate user and verify product catalog is displayed</doc>
+<status status="FAIL" start="2026-11-03T02:34:04.666020" elapsed="0.001514">Setup failed:
+No keyword with name 'Open Browser' found.
+
+Also teardown failed:
+No keyword with name 'Close Browser' found.</status>
+</test>
+<doc>Health check tests for KPIT Auth Platform API.
+These tests verify that the API is up and responding correctly.</doc>
+<status status="FAIL" start="2026-11-03T02:34:04.615923" elapsed="0.051928"/>
+</suite>
+<statistics>
+<total>
+<stat pass="0" fail="3" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="0" fail="2" skip="0">api</stat>
+<stat pass="0" fail="2" skip="0">health</stat>
+<stat pass="0" fail="1" skip="0">smoke</stat>
+</tag>
+<suite>
+<stat name="01 Health Tests" id="s1" pass="0" fail="3" skip="0">01 Health Tests</stat>
+</suite>
+</statistics>
+<errors>
+<msg time="2026-11-03T02:34:04.655703" level="ERROR">Error in file '/app/robot_tests/suites/01_health_tests.robot' on line 5: Importing library 'RequestsLibrary' failed: ModuleNotFoundError: No module named 'RequestsLibrary'
+Traceback (most recent call last):
+  None
+PYTHONPATH:
+  /app/robot_tests
+  /usr/local/lib/python311.zip
+  /usr/local/lib/python3.11
+  /usr/local/lib/python3.11/lib-dynload
+  /usr/local/lib/python3.11/site-packages</msg>
+</errors>
+</robot>

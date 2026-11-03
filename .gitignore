@@ -228,3 +228,5 @@ node_modules/
 dist/
 .angular/
 *.log
+.env
+.env.txt
