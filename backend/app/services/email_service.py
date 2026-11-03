@@ -1,5 +1,6 @@
 import os
 import smtplib
+import requests
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
@@ -8,11 +9,12 @@ class EmailService:
     """Service pour l'envoi d'e-mails de sécurité Brevo."""
 
     def __init__(self):
-        # Récupération dynamique depuis le .env
-        self.smtp_server = os.getenv('MAIL_SERVER', 'smtp-relay.brevo.com')
-        self.smtp_port = int(os.getenv('MAIL_PORT', 587))
-        self.smtp_user = os.getenv('MAIL_USERNAME', '')
-        self.smtp_password = os.getenv('MAIL_PASSWORD', '')
+        # Récupération dynamique depuis le .env (les noms MAIL_* et SMTP_* sont acceptés)
+        self.api_key = os.getenv('BREVO_API_KEY', '')
+        self.smtp_server = os.getenv('MAIL_SERVER') or os.getenv('SMTP_HOST') or 'smtp-relay.brevo.com'
+        self.smtp_port = int(os.getenv('MAIL_PORT') or os.getenv('SMTP_PORT') or 587)
+        self.smtp_user = os.getenv('MAIL_USERNAME') or os.getenv('SMTP_USER') or ''
+        self.smtp_password = os.getenv('MAIL_PASSWORD') or os.getenv('SMTP_PASSWORD') or ''
         self.sender_email = os.getenv('MAIL_DEFAULT_SENDER', 'security@kpit-auth.com')
 
     def send_otp_email(self, recipient_email: str, otp_code: str, user_name: str = "User") -> bool:
@@ -60,7 +62,28 @@ class EmailService:
         </html>
         """
 
-        # Si les identifiants SMTP Brevo sont présents dans le .env
+        # 1) API HTTPS Brevo : fonctionne là où les ports SMTP sortants sont bloqués (ex. Render)
+        if self.api_key:
+            try:
+                resp = requests.post(
+                    'https://api.brevo.com/v3/smtp/email',
+                    headers={'api-key': self.api_key, 'accept': 'application/json'},
+                    json={
+                        'sender': {'name': 'KPIT Security Platform', 'email': self.sender_email},
+                        'to': [{'email': recipient_email}],
+                        'subject': subject,
+                        'htmlContent': html_content,
+                    },
+                    timeout=15,
+                )
+                if resp.status_code < 300:
+                    print(f"📧 [BREVO API SUCCESS] 2FA Code sent to {recipient_email}")
+                    return True
+                print(f"❌ [BREVO API ERROR] {resp.status_code} {resp.text[:200]}")
+            except Exception as e:
+                print(f"❌ [BREVO API ERROR] {e}")
+
+        # 2) SMTP Brevo si les identifiants sont présents
         if self.smtp_user and self.smtp_password:
             try:
                 msg = MIMEMultipart('alternative')
@@ -69,7 +92,7 @@ class EmailService:
                 msg['To'] = recipient_email
                 msg.attach(MIMEText(html_content, 'html'))
 
-                with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
+                with smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=15) as server:
                     server.starttls()
                     server.login(self.smtp_user, self.smtp_password)
                     server.sendmail(self.sender_email, recipient_email, msg.as_string())
