@@ -3,27 +3,27 @@
        [class.mobile-open]="mobileOpen">
 
   <div class="sidebar-toolbar">
-    <div class="logo-icon">
-      <mat-icon>fact_check</mat-icon>
-    </div>
-    <h2 class="logo-title" *ngIf="!collapsed || mobileOpen">KPIT</h2>
+    <app-brand-logo class="brand" [compact]="collapsed && !mobileOpen"></app-brand-logo>
+    <span class="brand-tag" *ngIf="!collapsed || mobileOpen">Test Platform</span>
   </div>
 
-  <nav class="sidebar-nav">
+  <nav class="sidebar-nav" aria-label="Main navigation">
     <div *ngFor="let section of filteredSections" class="nav-section">
 
       <div class="nav-subheading" *ngIf="!collapsed || mobileOpen">
         {{ section.title }}
       </div>
+      <div class="nav-divider" *ngIf="collapsed && !mobileOpen"></div>
 
       <a *ngFor="let item of section.items"
          class="nav-item"
          [class.active]="isRouteActive(item.route)"
          [class.disabled-nav]="!item.route"
+         [attr.title]="collapsed && !mobileOpen ? item.label : null"
          (click)="navigateTo(item)"
          matRipple
          [matRippleDisabled]="!item.route"
-         matRippleColor="rgba(255, 255, 255, 0.1)">
+         matRippleColor="rgba(185, 245, 58, 0.12)">
 
         <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
 
@@ -41,11 +41,11 @@
   </nav>
 
   <div class="sidebar-user" *ngIf="!collapsed || mobileOpen">
-    <div class="user-avatar">KM</div>
+    <div class="user-avatar">{{ initials }}</div>
     <div class="user-info">
-      <div class="user-name">Khammar Mohamed</div>
-      <div class="user-role">Test Manager</div>
+      <div class="user-name">{{ fullName }}</div>
+      <div class="user-role">{{ roleLabel }}</div>
     </div>
-    <mat-icon class="user-dropdown">arrow_drop_down</mat-icon>
+    <span class="user-online" title="Session active"></span>
   </div>
 </aside>

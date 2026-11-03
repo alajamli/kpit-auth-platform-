@@ -1,95 +1,18 @@
-.signup-container {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f8fafc;
-  padding: 2rem;
+// Same shell as the sign-in page (split showcase + form), so both screens read as one product.
+@import '../login/login.component.scss';
+
+.auth-card.wide { width: min(100%, 460px); }
+.card-header.compact { margin-bottom: 22px; }
+.title { font-size: 30px; }
+
+.form-row { display: flex; gap: 14px; }
+.half-width { flex: 1; min-width: 0; }
+
+.login-footer-link {
+  margin-top: 18px; text-align: center; color: var(--text-2); font-size: 13.5px;
+  a { font-weight: 700; }
 }
 
-.signup-card {
-  width: 100%;
-  max-width: 480px;
-  padding: 2.5rem;
-  border-radius: 16px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-  background: #ffffff;
-}
-
-.signup-header {
-  text-align: center;
-  margin-bottom: 2rem;
-
-  .logo-icon {
-    width: 56px;
-    height: 56px;
-    background: #eef2ff;
-    color: #3730a3;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 1rem;
-
-    mat-icon {
-      font-size: 28px;
-      width: 28px;
-      height: 28px;
-    }
-  }
-
-  h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #1e293b;
-    margin: 0 0 0.5rem 0;
-  }
-
-  p {
-    color: #64748b;
-    font-size: 0.875rem;
-    margin: 0;
-  }
-}
-
-.form-row {
-  display: flex;
-  gap: 1rem;
-}
-
-.half-width {
-  flex: 1;
-  margin-bottom: 0.5rem;
-}
-
-.full-width {
-  width: 100%;
-  margin-bottom: 0.5rem;
-}
-
-.submit-btn {
-  width: 100%;
-  padding: 0.75rem;
-  font-size: 1rem;
-  font-weight: 600;
-  background-color: #3730a3 !important;
-  color: #ffffff !important;
-  border-radius: 8px;
-  margin-top: 1rem;
-}
-
-.login-link {
-  text-align: center;
-  margin-top: 1.5rem;
-  font-size: 0.875rem;
-  color: #64748b;
-
-  a {
-    color: #3730a3;
-    text-decoration: none;
-    font-weight: 600;
-    &:hover {
-      text-decoration: underline;
-    }
-  }
+@media (max-width: 520px) {
+  .form-row { flex-direction: column; gap: 0; }
 }

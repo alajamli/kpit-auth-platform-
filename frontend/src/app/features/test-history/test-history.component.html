@@ -78,7 +78,8 @@
       <div class="log-list" *ngIf="selectedJob.logs?.length">
         <div class="log-line" *ngFor="let log of selectedJob.logs">
           <span class="log-time">{{ log.timestamp }}</span>
-          <span>{{ log.message }}</span>
+          <mat-icon class="log-ico" [ngClass]="'k-' + logKind(log.message)">{{ logIcon(log.message) }}</mat-icon>
+          <span>{{ logText(log.message) }}</span>
         </div>
       </div>
     </div>

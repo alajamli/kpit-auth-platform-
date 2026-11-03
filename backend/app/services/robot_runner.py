@@ -34,6 +34,11 @@ class RobotFrameworkRunner:
             self.venv_python = self.robot_tests_dir / 'venv' / 'Scripts' / 'python.exe'
         else:
             self.venv_python = self.robot_tests_dir / 'venv' / 'bin' / 'python'
+
+        # Docker / no dedicated venv: fall back to the interpreter running the backend
+        # (robotframework is installed in it via requirements.txt).
+        if not self.venv_python.exists():
+            self.venv_python = Path(sys.executable)
         
         # Créer le dossier results s'il n'existe pas
         self.results_dir.mkdir(parents=True, exist_ok=True)

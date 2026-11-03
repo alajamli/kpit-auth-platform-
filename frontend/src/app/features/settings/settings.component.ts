@@ -6,6 +6,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-settings',
@@ -28,11 +29,34 @@ export class SettingsComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    public theme: ThemeService
   ) {}
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
+  }
+
+  get initials(): string {
+    const u = this.currentUser;
+    return u ? `${u.first_name?.charAt(0) ?? ''}${u.last_name?.charAt(0) ?? ''}`.toUpperCase() || 'U' : 'U';
+  }
+
+  /** Display-only summary of what the current role may do (mirrors the existing guards). */
+  get permissions(): { label: string; allowed: boolean }[] {
+    const role = this.currentUser?.role;
+    const canRun = role === 'admin' || role === 'tester';
+    const isAdmin = role === 'admin';
+    return [
+      { label: 'View test cases, reports and history', allowed: true },
+      { label: 'Run tests and generate them with AI', allowed: canRun },
+      { label: 'Create, edit and delete test cases', allowed: isAdmin },
+      { label: 'Manage users and roles', allowed: isAdmin }
+    ];
+  }
+
+  setTheme(dark: boolean): void {
+    this.theme.set(dark);
   }
 
   savePreferences(): void {

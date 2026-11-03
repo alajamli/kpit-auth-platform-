@@ -1,3 +1,5 @@
+import { logIcon, logKind, logText } from '../../core/utils/log-format';
+import { environment } from '../../../environments/environment';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -414,7 +416,8 @@ export class TestManagementComponent implements OnInit, OnDestroy {
   }
 
   openReport(): void {
-    const reportUrl = `${window.location.protocol}//${window.location.hostname}:5000/api/tests/report`;
+    // same base as every other API call: '/api' behind nginx (Docker), localhost:5000 in dev
+    const reportUrl = `${environment.apiUrl}/tests/report`;
     window.open(reportUrl, '_blank');
   }
 
@@ -504,6 +507,18 @@ export class TestManagementComponent implements OnInit, OnDestroy {
     return tagMap[tag] || 'label-primary';
   }
 
+  /** Number of filters currently applied (shown as a badge on the Filters button). */
+  get activeFilterCount(): number {
+    return (this.selectedSuite !== 'all' ? 1 : 0) +
+           (this.selectedStatus !== 'all' ? 1 : 0) +
+           (this.selectedTags.length ? 1 : 0);
+  }
+
+  // Log display helpers (emoji -> icon), see core/utils/log-format.ts
+  readonly logKind = logKind;
+  readonly logText = logText;
+  readonly logIcon = logIcon;
+
   hasActiveFilters(): boolean {
     return this.selectedSuite !== 'all' || 
            this.selectedStatus !== 'all' || 
@@ -522,15 +537,17 @@ export class TestManagementComponent implements OnInit, OnDestroy {
 
   // ============ CRUD OPERATIONS ============
 
-        openAddTestDialog(): void {
+  openAddTestDialog(initialTab?: 'ai'): void {
     const dialogRef = this.dialog.open(TestCaseDialogComponent, {
-      width: '620px',
+      width: '600px',
       maxWidth: '95vw',
       autoFocus: false,
       restoreFocus: true,
       panelClass: 'vex-dialog-panel',
       data: {
         mode: 'add',
+        initialTab: initialTab,
+        aiOnly: initialTab === 'ai' && !this.canManageTests,
         suiteName: (this.suites && this.suites.length ? this.suites[0] : ''),
         suites: this.suites || [],
         availableTags: this.availableTags && this.availableTags.length 
@@ -638,7 +655,7 @@ generateTestWithAI(): void {
     this.isGenerating = true;
     this.generatedCode = '';
 
-    const defaultTestName = `TC_AI_${Date.now()}`;
+    const defaultTestName = `TC-AI-${Date.now()}`;
 
     this.testService.generateTestWithAI(
       this.aiRequirement.trim(),

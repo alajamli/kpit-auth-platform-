@@ -1,29 +1,46 @@
-version: '3.8'
-
 services:
   backend:
     build: ./backend
     container_name: kpit_backend
-    restart: always
+    restart: unless-stopped
+    # Secrets (GROQ_API_KEY, SMTP_*, JWT_SECRET_KEY ...) are read from .env – never baked in the image.
+    # Locally python-dotenv finds the root .env by walking up the folders; a container only sees /app,
+    # so the file(s) must be passed explicitly.
+    env_file:
+      - path: ./.env
+        required: false
+      - path: ./backend/.env
+        required: false
     environment:
-      - FLASK_ENV=production
       - PORT=5000
+    # Chrome needs more than Docker's default 64 MB /dev/shm or it crashes mid-test.
+    shm_size: "2gb"
     volumes:
       - ./backend:/app
-      - ./robot_tests:/app/robot_tests    # <-- AJOUTER CETTE LIGNE
+      - ./robot_tests:/app/robot_tests
+      # The backend resolves the project root as "/" inside the container, so it reads /robot_tests
+      - ./robot_tests:/robot_tests
     ports:
-      - "5000:5000"
+      - "5001:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/api/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+      start_period: 25s
     networks:
       - kpit_network
 
   frontend:
     build: ./frontend
     container_name: kpit_frontend
-    restart: always
+    restart: unless-stopped
     ports:
-      - "9000:80"
+      - "9900:80"
+    # nginx resolves "backend" at start-up and exits if it is not reachable yet
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - kpit_network
 

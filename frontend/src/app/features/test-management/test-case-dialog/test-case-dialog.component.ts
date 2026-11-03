@@ -66,8 +66,13 @@ export class TestCaseDialogComponent implements OnInit {
     private snackBar: MatSnackBar
   ) {}
 
+  /** Testers may generate with AI but not create tests manually (server enforces it too). */
+  aiOnly = false;
+
   ngOnInit(): void {
     this.isEditMode = this.data?.mode === 'edit';
+    this.aiOnly = !!this.data?.aiOnly;
+    if (!this.isEditMode && this.data?.initialTab === 'ai') this.selectedTabIndex = 1;
     this.suites = this.data?.suites || [];
     this.availableTags = this.data?.availableTags || [];
     this.suiteName = this.data?.suiteName || (this.suites.length ? this.suites[0] : '');
@@ -144,7 +149,7 @@ export class TestCaseDialogComponent implements OnInit {
         ? (this.customSuiteName?.trim() || 'ai_generated_tests.robot')
         : (this.aiTargetSuite || '03_ui_tests.robot');
 
-    const testName = (this.aiTestName || `TC_AI_${Date.now()}`).trim();
+    const testName = (this.aiTestName || `TC-AI-${Date.now()}`).trim();
 
     // Signature service (order matters):
     // requirement, testName, targetUrl?, testData?, targetSuite?

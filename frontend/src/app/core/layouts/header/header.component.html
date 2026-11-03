@@ -4,44 +4,99 @@
           type="button"
           (click)="toggleMenu()"
           class="header-icon-btn"
-          matTooltip="Menu"
+          matTooltip="Toggle sidebar"
           aria-label="Toggle menu">
-    <mat-icon>menu</mat-icon>
+    <mat-icon>menu_open</mat-icon>
   </button>
+
+  <div class="page-crumb">
+    <span class="crumb-root">KPIT</span>
+    <mat-icon class="crumb-sep">chevron_right</mat-icon>
+    <span class="crumb-current">{{ pageTitle }}</span>
+  </div>
 
   <span class="flex-1"></span>
 
   <div class="header-actions">
+    <!-- Dark / light mode -->
     <button mat-icon-button
             type="button"
-            matTooltip="No new notifications"
-            class="header-icon-btn">
-      <mat-icon>notifications_none</mat-icon>
+            class="header-icon-btn theme-btn"
+            (click)="theme.toggle()"
+            [matTooltip]="theme.isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+            [attr.aria-label]="theme.isDark ? 'Switch to light mode' : 'Switch to dark mode'">
+      <mat-icon>{{ theme.isDark ? 'light_mode' : 'dark_mode' }}</mat-icon>
     </button>
+
+    <!-- Notifications -->
+    <button mat-icon-button
+            type="button"
+            class="header-icon-btn bell-btn"
+            [matMenuTriggerFor]="notifMenu"
+            (menuClosed)="onNotificationsClosed()"
+            [matTooltip]="unreadCount ? unreadCount + ' unread notifications' : 'No new notifications'"
+            aria-label="Notifications">
+      <mat-icon>{{ unreadCount ? 'notifications_active' : 'notifications_none' }}</mat-icon>
+      <span class="bell-badge" *ngIf="unreadCount">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
+    </button>
+
+    <mat-menu #notifMenu="matMenu" xPosition="before" class="notif-menu-panel">
+      <div class="notif-panel" (click)="$event.stopPropagation()">
+        <div class="notif-head">
+          <strong>Notifications</strong>
+          <button type="button" class="notif-clear" *ngIf="notifications.length" (click)="clearNotifications()">
+            Clear all
+          </button>
+        </div>
+
+        <div class="notif-list" *ngIf="notifications.length; else noNotif">
+          <div class="notif-item" *ngFor="let n of notifications" [class.unread]="!n.read">
+            <span class="notif-icon" [ngClass]="'k-' + n.kind"><mat-icon>{{ iconFor(n) }}</mat-icon></span>
+            <div class="notif-body">
+              <div class="notif-title">{{ n.title }}</div>
+              <div class="notif-msg">{{ n.message }}</div>
+              <div class="notif-time">{{ n.createdAt | date:'MMM d, HH:mm' }}</div>
+            </div>
+          </div>
+        </div>
+        <ng-template #noNotif>
+          <div class="notif-empty">
+            <mat-icon>notifications_off</mat-icon>
+            <span>You are all caught up.</span>
+            <small>Finished test runs and security alerts appear here.</small>
+          </div>
+        </ng-template>
+      </div>
+    </mat-menu>
 
     <div class="divider-vertical"></div>
 
-    <button mat-icon-button
-            type="button"
+    <!-- Account -->
+    <button type="button"
+            class="user-btn"
             [matMenuTriggerFor]="userMenu"
-            matTooltip="Account"
-            class="user-btn">
-      <div class="user-avatar-mini">
-        {{ currentUser?.first_name?.charAt(0) || 'A' }}{{ currentUser?.last_name?.charAt(0) || 'B' }}
-      </div>
+            aria-label="Account menu">
+      <span class="user-avatar-mini">{{ initials }}</span>
+      <span class="user-meta">
+        <span class="user-meta-name">{{ currentUser?.first_name }} {{ currentUser?.last_name }}</span>
+        <span class="user-meta-role">{{ currentUser?.role }}</span>
+      </span>
+      <mat-icon class="user-caret">expand_more</mat-icon>
     </button>
 
-    <mat-menu #userMenu="matMenu">
-      <div class="user-menu-header" style="padding: 12px 16px; outline: none;">
-        <strong style="display:block; font-size:14px;">
-          {{ currentUser?.first_name }} {{ currentUser?.last_name }}
-        </strong>
-        <span style="color:#64748b; font-size:12px;">{{ currentUser?.email }}</span>
+    <mat-menu #userMenu="matMenu" xPosition="before">
+      <div class="user-menu-header" (click)="$event.stopPropagation()">
+        <strong>{{ currentUser?.first_name }} {{ currentUser?.last_name }}</strong>
+        <span>{{ currentUser?.email }}</span>
       </div>
       <mat-divider></mat-divider>
+      <button mat-menu-item type="button" (click)="theme.toggle()">
+        <mat-icon>{{ theme.isDark ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        <span>{{ theme.isDark ? 'Light mode' : 'Dark mode' }}</span>
+      </button>
       <button mat-menu-item type="button" (click)="logout()">
-        <mat-icon color="warn">logout</mat-icon>
-        <span style="color:#dc2626; font-weight:500;">Sign Out</span>
+        <mat-icon class="logout-icon">logout</mat-icon>
+        <span class="logout-label">Sign out</span>
       </button>
     </mat-menu>
   </div>

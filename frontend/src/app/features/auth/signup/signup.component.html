@@ -1,53 +1,100 @@
-<div class="signup-container">
-  <mat-card class="signup-card">
-    <div class="signup-header">
-      <div class="logo-icon">
-        <mat-icon>person_add</mat-icon>
-      </div>
-      <h2>Create an Account</h2>
-      <p>Join the AI-Powered Test Automation Platform</p>
+<div class="login-page">
+
+  <button type="button" class="theme-fab" (click)="theme.toggle()"
+          [attr.aria-label]="theme.isDark ? 'Switch to light mode' : 'Switch to dark mode'">
+    <mat-icon>{{ theme.isDark ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
+
+  <aside class="showcase" aria-hidden="true">
+    <div class="aurora a1"></div>
+    <div class="aurora a2"></div>
+    <div class="grid-bg"></div>
+
+    <div class="showcase-top">
+      <app-brand-logo class="showcase-logo"></app-brand-logo>
+      <span class="showcase-tag">Test Platform</span>
     </div>
 
-    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-      <div class="form-row">
-        <mat-form-field appearance="outline" class="half-width">
-          <mat-label>First Name</mat-label>
-          <input matInput formControlName="first_name" placeholder="John" required>
-        </mat-form-field>
+    <div class="showcase-copy">
+      <span class="kicker"><span class="dot"></span> Create your workspace access</span>
+      <h2>Join the team.<br /><em>Test smarter.</em><br />Ship with proof.</h2>
+      <p>One account gives you AI test generation, live execution logs and PDF reports.</p>
+    </div>
 
-        <mat-form-field appearance="outline" class="half-width">
-          <mat-label>Last Name</mat-label>
-          <input matInput formControlName="last_name" placeholder="Doe" required>
-        </mat-form-field>
+    <div class="console">
+      <div class="console-bar">
+        <i></i><i></i><i></i>
+        <span>robot &middot; ai-generated suite</span>
+        <b class="live">LIVE</b>
+      </div>
+      <div class="console-body">
+        <div class="term-line cmd"><span class="prompt">$</span> robot --include ai-generated suites/</div>
+        <div class="term-line"><span class="name">TC-AI-01 Login with valid credentials</span><span class="fill"></span><span class="pass">PASS</span></div>
+        <div class="term-line"><span class="name">TC-AI-02 Wrong password shows an error</span><span class="fill"></span><span class="pass">PASS</span></div>
+        <div class="term-line"><span class="name">TC-AI-03 Anomaly score returned at login</span><span class="fill"></span><span class="pass">PASS</span></div>
+        <div class="term-line"><span class="name">TC-AI-04 Add item to cart</span><span class="fill"></span><span class="pass">PASS</span></div>
+        <div class="term-line summary"><span class="bar"><span class="bar-fill"></span></span><span class="sum">4 tests &middot; 4 passed &middot; 0 failed</span></div>
+      </div>
+    </div>
+
+    <div class="showcase-foot">
+      <span><mat-icon>psychology</mat-icon> Isolation-Forest risk scoring</span>
+      <span><mat-icon>verified_user</mat-icon> 2-step verification</span>
+    </div>
+  </aside>
+
+  <main class="auth-pane">
+    <div class="auth-card wide">
+      <app-brand-logo class="mobile-logo"></app-brand-logo>
+
+      <div class="card-header compact">
+        <div class="eyebrow"><span class="status-dot"></span> NEW ACCOUNT</div>
+        <h1 class="title">Create an Account</h1>
+        <p class="subtitle">Join the AI-Powered Test Automation Platform</p>
       </div>
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Email Address</mat-label>
-        <input matInput type="email" formControlName="email" placeholder="john.doe@example.com" required>
-        <mat-icon matSuffix>email</mat-icon>
-      </mat-form-field>
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="login-form">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="first_name" placeholder="John" required>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="last_name" placeholder="Doe" required>
+          </mat-form-field>
+        </div>
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Username</mat-label>
-        <input matInput formControlName="login" placeholder="johndoe" required>
-        <mat-icon matSuffix>account_circle</mat-icon>
-      </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email Address</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="john.doe@example.com" required>
+          <mat-icon matSuffix>email</mat-icon>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Password</mat-label>
-        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" required>
-        <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button" tabindex="-1">
-          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username</mat-label>
+          <input matInput formControlName="login" placeholder="johndoe" required>
+          <mat-icon matSuffix>account_circle</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" required>
+          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button" tabindex="-1">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" class="submit-btn" type="submit"
+                [disabled]="signupForm.invalid || isLoading">
+          <span>{{ isLoading ? 'Creating Account...' : 'Sign Up' }}</span>
+          <mat-icon iconPositionEnd>arrow_forward</mat-icon>
         </button>
-      </mat-form-field>
 
-      <button mat-raised-button color="primary" class="submit-btn" type="submit" [disabled]="signupForm.invalid || isLoading">
-        {{ isLoading ? 'Creating Account...' : 'Sign Up' }}
-      </button>
-
-      <div class="login-link">
-        Already have an account? <a routerLink="/login">Sign In</a>
-      </div>
-    </form>
-  </mat-card>
+        <div class="login-footer-link">
+          Already have an account? <a routerLink="/login">Sign In</a>
+        </div>
+      </form>
+    </div>
+  </main>
 </div>

@@ -1,332 +1,410 @@
+@use '@angular/material' as mat;
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://rsms.me/inter/inter.css');
+/* =========================================================
+   KPIT DESIGN SYSTEM
+   Identity : electric lime on near-black (taken from the KPIT logo)
+   Modes    : light (default) / dark  →  <html data-theme="dark">
+   ========================================================= */
 
-/* ============ VEX DESIGN SYSTEM ============ */
+/* ---------- 1. Angular Material theme (custom, replaces indigo-pink) ---------- */
+@include mat.core();
+
+$kpit-lime-dark: (
+  50: #f7ffe0, 100: #ecffb8, 200: #dcff85, 300: #cbff52, 400: #c4f93f,
+  500: #b9f53a, 600: #a3e61f, 700: #84cc16, 800: #65a30d, 900: #4d7c0f,
+  A100: #dcff85, A200: #c4f93f, A400: #a3e61f, A700: #84cc16,
+  contrast: (50: #0c0d0a, 100: #0c0d0a, 200: #0c0d0a, 300: #0c0d0a, 400: #0c0d0a,
+    500: #0c0d0a, 600: #0c0d0a, 700: #0c0d0a, 800: #ffffff, 900: #ffffff,
+    A100: #0c0d0a, A200: #0c0d0a, A400: #0c0d0a, A700: #0c0d0a)
+);
+$kpit-lime-light: (
+  50: #f7fee7, 100: #ecfccb, 200: #d9f99d, 300: #bef264, 400: #a3e635,
+  500: #4d7c0f, 600: #3f6212, 700: #365314, 800: #2c4310, 900: #1f3009,
+  A100: #d9f99d, A200: #a3e635, A400: #65a30d, A700: #4d7c0f,
+  contrast: (50: #0c0d0a, 100: #0c0d0a, 200: #0c0d0a, 300: #0c0d0a, 400: #0c0d0a,
+    500: #ffffff, 600: #ffffff, 700: #ffffff, 800: #ffffff, 900: #ffffff,
+    A100: #0c0d0a, A200: #0c0d0a, A400: #ffffff, A700: #ffffff)
+);
+$kpit-sky: mat.define-palette(mat.$cyan-palette, 700);
+$kpit-red: mat.define-palette(mat.$red-palette, 600);
+
+$kpit-typography: mat.define-typography-config(
+  $font-family: 'Inter, system-ui, sans-serif'
+);
+
+$kpit-light: mat.define-light-theme((
+  color: (
+    primary: mat.define-palette($kpit-lime-light, 500),
+    accent: $kpit-sky,
+    warn: $kpit-red
+  ),
+  typography: $kpit-typography,
+  density: 0
+));
+$kpit-dark: mat.define-dark-theme((
+  color: (
+    primary: mat.define-palette($kpit-lime-dark, 500),
+    accent: mat.define-palette(mat.$cyan-palette, 300),
+    warn: mat.define-palette(mat.$red-palette, 400)
+  ),
+  typography: $kpit-typography,
+  density: 0
+));
+
+@include mat.all-component-themes($kpit-light);
+:root[data-theme='dark'] {
+  @include mat.all-component-colors($kpit-dark);
+}
+
+/* ---------- 2. Design tokens ---------- */
 :root {
-  /* Colors - Assombries et plus professionnelles */
-  --vex-sidebar-bg: #0f172a; /* Slate 900 (plus profond) */
-  --vex-sidebar-item-color: #cbd5e1;
-  --vex-sidebar-item-hover: rgba(255, 255, 255, 0.06);
-  --vex-sidebar-item-active-bg: rgba(79, 70, 229, 0.15);
-  --vex-sidebar-subheading: rgba(148, 163, 184, 0.8);
-  
-  /* Primary plus foncé, moins agressif */
-  --vex-primary: #4f46e5;     /* Indigo 600 au lieu de 500 */
-  --vex-primary-600: #4338ca; /* Indigo 700 */
-  --vex-primary-700: #3730a3; /* Indigo 800 */
-  
-  --vex-accent: #d97706;      /* Ambre plus sombre */
-  --vex-warn: #dc2626;        /* Rouge standard pro */
-  
-  --vex-background: #f8fafc;
-  --vex-card: #ffffff;
-  --vex-border: #e2e8f0;
-  --vex-text: #0f172a;
-  --vex-text-secondary: #475569;
-  --vex-text-hint: #94a3b8;
-  --vex-text-icon: #64748b;
-  
-  /* Dimensions */
-  --vex-sidebar-width: 280px;
-  --vex-sidebar-collapsed-width: 72px;
-  --vex-toolbar-height: 64px;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --lime: #b9f53a;
+  --lime-strong: #a3e61f;
+
+  --bg: #f3f4ef;
+  --surface: #ffffff;
+  --surface-2: #f8f9f5;
+  --surface-3: #eef0e8;
+  --border: #e1e4d8;
+  --border-strong: #cdd2bf;
+  --text: #0c0d0a;
+  --text-2: #4a4f42;
+  --text-3: #7d8374;
+
+  --accent: #b9f53a;
+  --accent-hover: #a3e61f;
+  --accent-ink: #0c0d0a;
+  --accent-text: #3f6212;
+  --accent-soft: rgba(132, 204, 22, 0.14);
+  --accent-ring: rgba(132, 204, 22, 0.38);
+
+  --success: #15803d;
+  --success-soft: #dcfce7;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+  --warning: #b45309;
+  --warning-soft: #fef3c7;
+  --info: #0369a1;
+  --info-soft: #e0f2fe;
+  --violet: #6d28d9;
+  --violet-soft: #ede9fe;
+
+  --sidebar-bg: #0a0b09;
+  --sidebar-border: rgba(255, 255, 255, 0.07);
+  --sidebar-text: #a4a995;
+  --sidebar-text-strong: #f2f4ec;
+  --sidebar-hover: rgba(255, 255, 255, 0.06);
+  --sidebar-active: rgba(185, 245, 58, 0.12);
+
+  --header-bg: rgba(243, 244, 239, 0.82);
+
+  --shadow-xs: 0 1px 2px rgba(12, 13, 10, 0.05);
+  --shadow-sm: 0 1px 3px rgba(12, 13, 10, 0.07), 0 1px 2px rgba(12, 13, 10, 0.04);
+  --shadow-md: 0 8px 24px -6px rgba(12, 13, 10, 0.12), 0 2px 6px rgba(12, 13, 10, 0.05);
+  --shadow-lg: 0 24px 60px -12px rgba(12, 13, 10, 0.25);
+
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --vex-sidebar-width: 272px;
+  --vex-sidebar-collapsed-width: 76px;
+  --vex-toolbar-height: 68px;
+
+  /* legacy aliases (kept so older component styles still resolve) */
+  --vex-primary: var(--accent-text);
+  --vex-background: var(--bg);
+  --vex-card: var(--surface);
+  --vex-border: var(--border);
+  --vex-text: var(--text);
+  --vex-text-secondary: var(--text-2);
+  --vex-text-hint: var(--text-3);
+  --vex-text-icon: var(--text-2);
+
+  color-scheme: light;
 }
 
-/* ... (Garde ton code html, body, scrollbar) ... */
+:root[data-theme='dark'] {
+  --bg: #0a0b09;
+  --surface: #121410;
+  --surface-2: #181a14;
+  --surface-3: #1f221a;
+  --border: #25291f;
+  --border-strong: #363b2b;
+  --text: #f2f4ec;
+  --text-2: #b4baa6;
+  --text-3: #7f866f;
 
-/* =========================================================
-   SNACKBARS (Alertes) — Design Enterprise
-   Couleurs profondes, texte blanc, pas d'effet "jouet fluo"
-   ========================================================= */
-.snackbar-success .mdc-snackbar__surface {
-  background-color: #064e3b !important; /* Vert forêt très sombre (Emerald 900) */
-  color: #ffffff !important;
-  font-weight: 500;
+  --accent-text: #c6f45a;
+  --accent-soft: rgba(185, 245, 58, 0.11);
+  --accent-ring: rgba(185, 245, 58, 0.4);
+
+  --success: #4ade80;
+  --success-soft: rgba(74, 222, 128, 0.12);
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.13);
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.12);
+  --info: #38bdf8;
+  --info-soft: rgba(56, 189, 248, 0.12);
+  --violet: #a78bfa;
+  --violet-soft: rgba(167, 139, 250, 0.13);
+
+  --sidebar-bg: #070806;
+  --header-bg: rgba(10, 11, 9, 0.8);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 10px 30px -8px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 28px 70px -12px rgba(0, 0, 0, 0.8);
+
+  color-scheme: dark;
 }
 
-.snackbar-error .mdc-snackbar__surface {
-  background-color: #7f1d1d !important; /* Rouge sang (Red 900) */
-  color: #ffffff !important;
-  font-weight: 500;
+/* ---------- 3. Base ---------- */
+html,
+body {
+  min-height: 100%;
 }
 
-.snackbar-warning .mdc-snackbar__surface {
-  background-color: #78350f !important; /* Ambre très sombre (Amber 900) */
-  color: #ffffff !important;
-  font-weight: 500;
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-.snackbar-info .mdc-snackbar__surface {
-  background-color: #1e3a8a !important; /* Bleu sombre (Blue 900) */
-  color: #ffffff !important;
-  font-weight: 500;
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  color: var(--text);
 }
 
-/* (Garde la suite de ton fichier styles.scss pour le mat-form-field outline) */
-/* =========================================================
-   VEX + Angular Material MDC
-   Supprime la ligne verticale des mat-form-field outline
-   (conflit fréquent avec Tailwind Preflight)
-   ========================================================= */
-/* =========================================================
-   VEX + Material outline
-   - pas de ligne verticale (repos / focus / erreur)
-   - focus violet VEX
-   ========================================================= */
-
-.mat-mdc-form-field.mat-form-field-appearance-outline {
-
-  /* --- Icône préfixe --- */
-  .mat-mdc-form-field-icon-prefix {
-    padding: 0 12px 0 4px !important;
-    margin: 0 !important;
-    border: none !important;
-    color: #9ca3af !important;
-
-    &::before,
-    &::after {
-      display: none !important;
-      content: none !important;
-    }
-
-    .mat-icon {
-      margin: 0 !important;
-      padding: 0 !important;
-      font-size: 20px !important;
-      width: 20px !important;
-      height: 20px !important;
-    }
-  }
-
-  .mat-mdc-form-field-infix {
-    padding-left: 0 !important;
-    border-left: none !important;
-  }
-
-  /* --- Jointure outline : TOUJOURS sans bord vertical --- */
-  .mdc-notched-outline__leading {
-    border-right-width: 0 !important;
-    border-right-style: none !important;
-  }
-
-  .mdc-notched-outline__notch {
-    border-left-width: 0 !important;
-    border-right-width: 0 !important;
-  }
-
-  /* Couleur repos */
-  .mdc-notched-outline__leading,
-  .mdc-notched-outline__notch,
-  .mdc-notched-outline__trailing {
-    border-color: #e5e7eb !important;
-  }
-
-  /* Hover */
-  &:hover .mdc-notched-outline__leading,
-  &:hover .mdc-notched-outline__notch,
-  &:hover .mdc-notched-outline__trailing {
-    border-color: #d1d5db !important;
-  }
-
-  /*
-   * FOCUS — IMPORTANT
-   * Ne JAMAIS faire border-width: 2px sur .leading en entier
-   * sinon border-right revient et recrée la ligne verticale.
-   */
-  &.mat-focused {
-    .mdc-notched-outline__leading {
-      border-color: #6366f1 !important;
-      border-top-width: 2px !important;
-      border-bottom-width: 2px !important;
-      border-left-width: 2px !important;
-      border-right-width: 0 !important;
-      border-right-style: none !important;
-    }
-
-    .mdc-notched-outline__notch {
-      border-color: #6366f1 !important;
-      border-top-width: 2px !important;
-      border-bottom-width: 2px !important;
-      border-left-width: 0 !important;
-      border-right-width: 0 !important;
-    }
-
-    .mdc-notched-outline__trailing {
-      border-color: #6366f1 !important;
-      border-top-width: 2px !important;
-      border-bottom-width: 2px !important;
-      border-right-width: 2px !important;
-      border-left-width: 0 !important;
-    }
-
-    .mat-mdc-form-field-icon-prefix {
-      color: #6366f1 !important;
-    }
-
-    .mdc-floating-label {
-      color: #6366f1 !important;
-    }
-  }
-
-  /*
-   * ERREUR (invalid) — même principe, couleur rouge Material
-   */
-  &.mat-form-field-invalid {
-    .mdc-notched-outline__leading {
-      border-color: #f44336 !important;
-      border-right-width: 0 !important;
-      border-right-style: none !important;
-    }
-
-    .mdc-notched-outline__notch {
-      border-color: #f44336 !important;
-      border-left-width: 0 !important;
-      border-right-width: 0 !important;
-    }
-
-    .mdc-notched-outline__trailing {
-      border-color: #f44336 !important;
-    }
-
-    /* Icône reste grise (plus pro que rouge) — style VEX */
-    .mat-mdc-form-field-icon-prefix {
-      color: #9ca3af !important;
-    }
-
-    &.mat-focused {
-      .mdc-notched-outline__leading {
-        border-top-width: 2px !important;
-        border-bottom-width: 2px !important;
-        border-left-width: 2px !important;
-        border-right-width: 0 !important;
-      }
-
-      .mdc-notched-outline__notch {
-        border-top-width: 2px !important;
-        border-bottom-width: 2px !important;
-        border-left-width: 0 !important;
-        border-right-width: 0 !important;
-      }
-
-      .mdc-notched-outline__trailing {
-        border-top-width: 2px !important;
-        border-bottom-width: 2px !important;
-        border-right-width: 2px !important;
-      }
-    }
-  }
+a {
+  color: var(--accent-text);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
 }
 
-/* =========================================================
-   VEX mat-select panel (overlay)
-   ========================================================= */
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
 
-.vex-select-panel.mat-mdc-select-panel,
-.vex-select-panel {
-  border-radius: 12px !important;
-  border: 1px solid #e5e7eb !important;
-  box-shadow:
-    0 10px 15px -3px rgba(0, 0, 0, 0.08),
-    0 4px 6px -4px rgba(0, 0, 0, 0.06) !important;
-  padding: 6px !important;
-  min-width: 220px !important;
-  max-height: 280px !important;
-  background: #ffffff !important;
-  margin-top: 4px;
+:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 2px;
+}
 
-  /* Scrollbar fine et discrète */
+* {
   scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
+  scrollbar-color: var(--border-strong) transparent;
+}
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+}
 
-  &::-webkit-scrollbar {
-    width: 6px;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
+}
 
-  &::-webkit-scrollbar-track {
-    background: transparent;
-    margin: 8px 0;
+@keyframes kpit-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes kpit-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--accent-ring); }
+  50% { box-shadow: 0 0 0 6px transparent; }
+}
+
+/* ---------- 4. Shared page primitives (used by every feature page) ---------- */
+.page-container,
+.test-management-page,
+.welcome-page,
+.user-management-container {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.page-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+.page-subtitle {
+  margin: 6px 0 0;
+  color: var(--text-2);
+  font-size: 14px;
+}
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  color: var(--text-3);
+  font-size: 12.5px;
+  font-weight: 500;
+  .icon-home { font-size: 16px; width: 16px; height: 16px; }
+  .dot { opacity: 0.5; }
+  .crumb { cursor: default; }
+  .crumb:not(.current):hover { color: var(--accent-text); cursor: pointer; }
+  .crumb.current { color: var(--text-2); }
+}
+
+.content-card,
+.vex-card,
+.main-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+.content-card { overflow: hidden; }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+  h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
+  > mat-icon { color: var(--accent-text); }
+}
 
-  &::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 9999px;
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 56px 24px;
+  text-align: center;
+  color: var(--text-3);
+  mat-icon {
+    width: 48px; height: 48px; font-size: 48px;
+    margin-bottom: 6px;
+    color: var(--border-strong);
   }
+  h3 { margin: 0; color: var(--text); font-size: 16px; }
+  p { margin: 0; max-width: 360px; }
+}
 
-  &::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
-  }
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 72px 0;
+}
 
-  /* Option */
-  .mat-mdc-option {
-    min-height: 40px !important;
-    border-radius: 8px !important;
-    margin: 2px 0 !important;
-    padding: 0 12px !important;
-    font-size: 14px !important;
-    color: #111827 !important;
-    transition: background-color 0.15s ease;
+/* Tables (mat-table + native) */
+.vex-table {
+  width: 100%;
+  background: transparent !important;
+  border-collapse: separate;
+  border-spacing: 0;
 
-    /* Hover */
-    &:hover:not(.mdc-list-item--disabled) {
-      background-color: #f3f4f6 !important;
-    }
-
-    /* Focus clavier */
-    &.mat-mdc-option-active {
-      background-color: #f3f4f6 !important;
-    }
-
-    /* Sélectionné (multi) */
-    &.mdc-list-item--selected:not(.mdc-list-item--disabled) {
-      background-color: rgba(99, 102, 241, 0.08) !important;
-
-      .mdc-list-item__primary-text {
-        color: #4f46e5 !important;
-        font-weight: 500;
-      }
-    }
-
-    /* Checkbox Material à l’intérieur de l’option */
-    .mdc-checkbox {
-      --mdc-checkbox-selected-checkmark-color: #ffffff;
-      --mdc-checkbox-selected-focus-icon-color: #6366f1;
-      --mdc-checkbox-selected-hover-icon-color: #6366f1;
-      --mdc-checkbox-selected-icon-color: #6366f1;
-      --mdc-checkbox-selected-pressed-icon-color: #4f46e5;
-      --mdc-checkbox-unselected-icon-color: #9ca3af;
-      --mdc-checkbox-unselected-hover-icon-color: #6b7280;
-      --mdc-checkbox-unselected-focus-icon-color: #6b7280;
-    }
-
-    .mdc-checkbox .mdc-checkbox__background {
-      border-radius: 4px !important;
-    }
-  }
-
-  /* Groupe / divider éventuel */
-  .mat-mdc-optgroup-label {
-    font-size: 11px !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.04em;
+  th, th.mat-mdc-header-cell {
+    background: var(--surface-2);
+    color: var(--text-3);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #9ca3af !important;
-    min-height: 32px !important;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
   }
+  td, td.mat-mdc-cell {
+    padding: 14px 16px;
+    color: var(--text);
+    font-size: 13.5px;
+    border-bottom: 1px solid var(--border);
+    background: transparent;
+  }
+  tr:last-child td { border-bottom: 0; }
+  tbody tr, tr.mat-mdc-row { transition: background-color 0.15s ease; }
+  tbody tr:hover, tr.mat-mdc-row:hover { background: var(--surface-2); }
 }
 
-/* Backdrop du select : léger flou optionnel (discret) */
-.cdk-overlay-backdrop.cdk-overlay-transparent-backdrop {
-  /* on laisse transparent pour ne pas griser tout le dialog */
+/* Status / role chips shared across pages */
+.chip,
+.status-chip,
+.role-badge,
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: capitalize;
+  background: var(--surface-3);
+  color: var(--text-2);
+  white-space: nowrap;
 }
-/* =========================================================
-   FIX PERMANENT : Material Icons Ligature & FOUT Prevention
-   Empêche l'affichage du texte brut (lo, pe, vis) si le réseau ralentit
-   ========================================================= */
-mat-icon, 
-.mat-icon {
+.status-chip::before,
+.status-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.status-completed, .status-passed, .badge-active, .status-PASS {
+  background: var(--success-soft); color: var(--success);
+}
+.status-failed, .badge-disabled, .status-FAIL {
+  background: var(--danger-soft); color: var(--danger);
+}
+.status-running, .status-starting {
+  background: var(--info-soft); color: var(--info);
+}
+
+/* ---------- 5. Material overrides (brand + dark mode) ---------- */
+mat-icon, .mat-icon {
   font-family: 'Material Icons' !important;
   font-weight: normal;
   font-style: normal;
@@ -340,18 +418,279 @@ mat-icon,
   direction: ltr;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  -moz-osx-font-smoothing: grayscale;
   font-feature-settings: 'liga';
-  
-  /* SÉCURITÉ ANTI-DÉBORDEMENT : */
-  overflow: hidden !important; 
+  overflow: hidden !important;
   vertical-align: middle;
 }
-/* Nettoyage du conteneur VEX Dialog pour éviter le scrollbar horizontal */
+
+/* Primary buttons = KPIT lime with black ink, in both themes */
+.mat-mdc-unelevated-button.mat-primary,
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-mini-fab.mat-primary,
+.mat-mdc-fab.mat-primary {
+  background-color: var(--accent) !important;
+  color: var(--accent-ink) !important;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  box-shadow: 0 1px 2px rgba(12, 13, 10, 0.18) !important;
+  transition: background-color 0.18s ease, transform 0.18s var(--ease), box-shadow 0.18s ease;
+  .mat-icon, .mdc-button__label { color: var(--accent-ink) !important; }
+  &:hover:not([disabled]) {
+    background-color: var(--accent-hover) !important;
+    box-shadow: 0 6px 18px -4px var(--accent-ring) !important;
+  }
+  &:active:not([disabled]) { transform: translateY(1px); }
+  &[disabled], &.mat-mdc-button-disabled {
+    background-color: var(--surface-3) !important;
+    color: var(--text-3) !important;
+    box-shadow: none !important;
+    .mat-icon, .mdc-button__label { color: var(--text-3) !important; }
+  }
+}
+.mat-mdc-unelevated-button, .mat-mdc-raised-button, .mat-mdc-outlined-button {
+  border-radius: 10px !important;
+  min-height: 40px;
+}
+.mat-mdc-outlined-button:not(:disabled) {
+  border-color: var(--border-strong) !important;
+  color: var(--text) !important;
+  &:hover { background: var(--surface-3); }
+}
+.mat-mdc-outlined-button.mat-warn:not(:disabled) { color: var(--danger) !important; border-color: var(--danger) !important; }
+.mat-mdc-button:not(:disabled) { color: var(--text-2); }
+.mat-mdc-icon-button { color: var(--text-2); }
+.mat-mdc-mini-fab { border-radius: 12px !important; }
+
+/* ---- One button system: same height, radius, type and icon rhythm everywhere ---- */
+.mat-mdc-button, .mat-mdc-unelevated-button, .mat-mdc-raised-button, .mat-mdc-outlined-button {
+  height: 40px;
+  min-width: 0;
+  padding: 0 18px;
+  border-radius: 12px !important;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1;
+
+  > .mat-icon {
+    width: 18px; height: 18px; font-size: 18px;
+    margin: 0 8px 0 -4px;
+  }
+  > .mat-icon[iconPositionEnd] { margin: 0 -4px 0 8px; }
+  > .mat-icon:only-child { margin: 0; }
+}
+.mat-mdc-button:not(:disabled) { color: var(--text-2); }
+.mat-mdc-button:not(:disabled):hover { background: var(--surface-3); color: var(--text); }
+.mat-mdc-outlined-button:not(:disabled) { background: var(--surface); }
+
+/* Refined finish: no tracking, subtle depth, small lift on hover */
+.mat-mdc-button .mdc-button__label,
+.mat-mdc-unelevated-button .mdc-button__label,
+.mat-mdc-raised-button .mdc-button__label,
+.mat-mdc-outlined-button .mdc-button__label { letter-spacing: 0 !important; }
+
+.mat-mdc-button, .mat-mdc-unelevated-button, .mat-mdc-raised-button, .mat-mdc-outlined-button {
+  transition: transform 0.18s var(--ease), box-shadow 0.18s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.mat-mdc-unelevated-button.mat-primary,
+.mat-mdc-raised-button.mat-primary {
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 62%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 1px 2px rgba(12, 13, 10, 0.22), 0 6px 14px -8px var(--accent-ring) !important;
+  &:hover:not([disabled]) {
+    transform: translateY(-1px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 10px 22px -8px var(--accent-ring) !important;
+  }
+  &:active:not([disabled]) { transform: translateY(0); }
+  &[disabled], &.mat-mdc-button-disabled { background-image: none; }
+}
+.mat-mdc-outlined-button:not(:disabled) {
+  box-shadow: var(--shadow-xs);
+  &:hover { transform: translateY(-1px); border-color: var(--text-3) !important; box-shadow: var(--shadow-sm); }
+  &:active { transform: translateY(0); }
+}
+.mat-mdc-outlined-button.mat-warn:not(:disabled) {
+  background: var(--danger-soft);
+  &:hover { background: var(--danger); color: #fff !important; border-color: var(--danger) !important; }
+}
+
+/* Paginator select: compact */
+.mat-mdc-paginator .mat-mdc-form-field.mat-form-field-appearance-outline {
+  --mat-form-field-container-height: 38px;
+  --mat-form-field-container-vertical-padding: 7px;
+  .mat-mdc-text-field-wrapper { box-shadow: none; }
+}
+.mat-mdc-paginator .mat-mdc-paginator-page-size-label,
+.mat-mdc-paginator .mat-mdc-paginator-range-label { font-size: 12.5px; color: var(--text-2); }
+
+/* Filter menu panel: wide enough for its selects (default menu max-width is 280px) */
+.filter-menu-panel.mat-mdc-menu-panel {
+  max-width: none !important;
+  min-width: 320px !important;
+  .mat-mdc-menu-content { padding: 0 !important; }
+}
+
+/* Cards, dialogs, menus, tooltips, paginator, tables */
+.mat-mdc-card {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border);
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.mat-mdc-menu-panel {
+  background: var(--surface) !important;
+  border: 1px solid var(--border);
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-md) !important;
+  .mat-mdc-menu-item .mdc-list-item__primary-text { color: var(--text); font-size: 13.5px; }
+  .mat-mdc-menu-item:hover:not([disabled]) { background: var(--surface-3); }
+}
+.mat-mdc-tooltip .mdc-tooltip__surface {
+  background: var(--text) !important;
+  color: var(--bg) !important;
+  font-size: 12px;
+  border-radius: 8px;
+}
+.mat-mdc-paginator {
+  background: transparent !important;
+  color: var(--text-2) !important;
+  border-top: 1px solid var(--border);
+}
+.mat-mdc-table { background: transparent !important; }
+.mat-divider { border-top-color: var(--border) !important; }
+.mat-mdc-checkbox .mdc-checkbox__background { border-radius: 5px !important; }
+.mat-mdc-tab-header { border-bottom: 1px solid var(--border); }
+.mat-mdc-tab .mdc-tab__text-label { color: var(--text-2); font-weight: 600; letter-spacing: 0; }
+.mat-mdc-tab.mdc-tab--active .mdc-tab__text-label { color: var(--text); }
+.mat-mdc-tab-group .mdc-tab-indicator__content--underline { border-color: var(--accent-text) !important; border-top-width: 3px; border-radius: 3px 3px 0 0; }
+.mat-button-toggle-group {
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  background: var(--surface);
+  .mat-button-toggle { background: transparent; color: var(--text-2); }
+  .mat-button-toggle-checked { background: var(--accent) !important; color: var(--accent-ink) !important; font-weight: 600; }
+  .mat-button-toggle-appearance-standard .mat-button-toggle-label-content { line-height: 34px; padding: 0 14px; font-size: 13px; }
+}
+.mat-mdc-slide-toggle.mat-primary {
+  --mdc-switch-selected-track-color: var(--accent-text);
+  --mdc-switch-selected-handle-color: var(--accent-ink);
+  --mdc-switch-selected-hover-track-color: var(--accent-text);
+  --mdc-switch-selected-focus-track-color: var(--accent-text);
+  --mdc-switch-selected-pressed-track-color: var(--accent-text);
+  --mdc-switch-selected-hover-handle-color: var(--accent-ink);
+  --mdc-switch-selected-focus-handle-color: var(--accent-ink);
+  --mdc-switch-selected-pressed-handle-color: var(--accent-ink);
+}
+:root[data-theme='dark'] .mat-mdc-slide-toggle.mat-primary {
+  --mdc-switch-selected-handle-color: #0c0d0a;
+}
+
+/* Notification centre panel (wider than a regular menu) */
+.notif-menu-panel.mat-mdc-menu-panel {
+  max-width: 92vw !important;
+  min-width: 340px !important;
+}
+
+/* ---------- 6. Form fields (outline, no vertical seam, lime focus) ---------- */
+.mat-mdc-form-field.mat-form-field-appearance-outline {
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing {
+    border-color: var(--border-strong) !important;
+    transition: border-color 0.15s ease;
+  }
+  .mat-mdc-text-field-wrapper { background: var(--surface); border-radius: 12px; }
+  --mat-form-field-container-height: 48px;
+  --mat-form-field-container-vertical-padding: 12px;
+  --mat-form-field-outlined-label-text-populated-size: 12px;
+  .mat-mdc-input-element, .mat-mdc-select, .mat-mdc-select-value-text { font-size: 14px; }
+  .mat-mdc-form-field-subscript-wrapper { font-size: 12px; }
+  &.compact-field {
+    --mat-form-field-container-height: 42px;
+    --mat-form-field-container-vertical-padding: 9px;
+  }
+  .mdc-notched-outline__leading { border-radius: 12px 0 0 12px !important; border-right-width: 0 !important; }
+  .mdc-notched-outline__trailing { border-radius: 0 12px 12px 0 !important; }
+  .mdc-notched-outline__notch { border-left-width: 0 !important; border-right-width: 0 !important; }
+  .mat-mdc-form-field-infix { border-left: none !important; }
+  .mdc-text-field--outlined { --mdc-outlined-text-field-container-shape: 12px; }
+  .mat-mdc-input-element, .mat-mdc-select-value, .mat-mdc-select-arrow { color: var(--text) !important; }
+  .mdc-floating-label, .mat-mdc-floating-label { color: var(--text-3) !important; }
+  .mat-mdc-form-field-hint { color: var(--text-3) !important; }
+  .mat-mdc-form-field-icon-prefix, .mat-mdc-form-field-icon-suffix { color: var(--text-3) !important; padding-left: 12px; }
+  .mat-mdc-form-field-icon-prefix { padding-right: 8px; border: none !important; }
+  .mat-mdc-form-field-icon-prefix > .mat-icon { font-size: 20px; width: 20px; height: 20px; }
+
+  &:hover .mdc-notched-outline__leading,
+  &:hover .mdc-notched-outline__notch,
+  &:hover .mdc-notched-outline__trailing { border-color: var(--text-3) !important; }
+
+  &.mat-focused {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing { border-color: var(--accent-text) !important; }
+    .mdc-notched-outline__leading { border-width: 2px 0 2px 2px !important; }
+    .mdc-notched-outline__notch { border-width: 2px 0 !important; }
+    .mdc-notched-outline__trailing { border-width: 2px 2px 2px 0 !important; }
+    .mdc-floating-label, .mat-mdc-floating-label { color: var(--accent-text) !important; }
+    .mat-mdc-form-field-icon-prefix { color: var(--accent-text) !important; }
+    .mat-mdc-text-field-wrapper { box-shadow: 0 0 0 4px var(--accent-soft); }
+  }
+  &.mat-form-field-invalid {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing { border-color: var(--danger) !important; }
+    .mdc-floating-label, .mat-mdc-floating-label { color: var(--danger) !important; }
+  }
+  .mat-mdc-form-field-error { color: var(--danger) !important; }
+}
+
+/* Select / autocomplete overlay panel */
+.vex-select-panel.mat-mdc-select-panel,
+.vex-select-panel,
+.mat-mdc-select-panel {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-md) !important;
+  padding: 6px !important;
+
+  .mat-mdc-option {
+    min-height: 40px !important;
+    border-radius: 8px !important;
+    margin: 2px 0 !important;
+    font-size: 14px !important;
+    color: var(--text) !important;
+    &:hover:not(.mdc-list-item--disabled),
+    &.mat-mdc-option-active { background: var(--surface-3) !important; }
+    &.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+      background: var(--accent-soft) !important;
+      .mdc-list-item__primary-text { color: var(--accent-text) !important; font-weight: 600; }
+    }
+  }
+}
+
+/* ---------- 7. Snackbars ---------- */
+.mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-md) !important;
+}
+.snackbar-success .mdc-snackbar__surface { background-color: #14532d !important; color: #fff !important; font-weight: 500; }
+.snackbar-error .mdc-snackbar__surface { background-color: #7f1d1d !important; color: #fff !important; font-weight: 500; }
+.snackbar-warning .mdc-snackbar__surface { background-color: #78350f !important; color: #fff !important; font-weight: 500; }
+.snackbar-info .mdc-snackbar__surface { background-color: #0c4a6e !important; color: #fff !important; font-weight: 500; }
+
 .vex-dialog-panel {
   .mat-mdc-dialog-container .mdc-dialog__surface {
     padding: 0 !important;
-    border-radius: 12px !important;
+    border-radius: var(--radius-lg) !important;
     overflow: hidden !important;
   }
 }

@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { logIcon, logKind, logText } from '../../core/utils/log-format';
 import { TestManagementService } from '../../core/services/test-management.service';
 
 @Component({
@@ -25,6 +26,10 @@ export class TestHistoryComponent implements OnInit {
   loading = false;
   history: any[] = [];
   selectedJob: any = null;
+  readonly logKind = logKind;
+  readonly logText = logText;
+  readonly logIcon = logIcon;
+
   displayedColumns = ['started_at', 'status', 'passed', 'failed', 'total', 'actions'];
 
   constructor(

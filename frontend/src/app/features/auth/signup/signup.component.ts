@@ -8,6 +8,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { BrandLogoComponent } from '../../../core/layouts/brand-logo/brand-logo.component';
+import { ThemeService } from '../../../core/services/theme.service';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -22,7 +24,8 @@ import { AuthService } from '../../../core/services/auth.service';
     MatFormFieldModule,
     MatButtonModule,
     MatIconModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    BrandLogoComponent
   ],
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss']
@@ -36,7 +39,8 @@ export class SignupComponent {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    public theme: ThemeService
   ) {
     this.signupForm = this.fb.group({
       first_name: ['', [Validators.required]],

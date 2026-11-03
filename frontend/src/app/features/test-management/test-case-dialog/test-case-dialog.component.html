@@ -4,10 +4,10 @@
   <div class="ai-dialog__header">
     <div class="ai-dialog__header-left">
       <div class="ai-dialog__icon-wrap">
-        <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
+        <mat-icon>{{ isEditMode ? 'edit' : (selectedTabIndex === 1 ? 'auto_awesome' : 'add') }}</mat-icon>
       </div>
       <div>
-        <h2 class="ai-dialog__title">{{ isEditMode ? 'Edit Test Case' : 'New Test Case' }}</h2>
+        <h2 class="ai-dialog__title">{{ isEditMode ? 'Edit Test Case' : (selectedTabIndex === 1 ? 'Generate Test with AI' : 'New Test Case') }}</h2>
         <p class="ai-dialog__subtitle">
           {{ isEditMode ? 'Update test metadata' : 'Manual entry or AI-assisted generation' }}
         </p>
@@ -34,7 +34,7 @@
       class="ai-dialog__tabs">
 
       <!-- MANUAL TAB -->
-      <mat-tab>
+      <mat-tab [disabled]="aiOnly">
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">edit_note</mat-icon>
           <span>Manual</span>
@@ -65,7 +65,7 @@
 
           <!-- Suite + Test name -->
           <!-- Suite + Test name -->
-<div class="ai-grid-2"[class.ai-grid-3]="aiTargetSuite === 'NEW_SUITE'">
+<div class="ai-grid-2" [class.ai-grid-3]="aiTargetSuite === 'NEW_SUITE'">
   <!-- Target suite (always visible) -->
   <mat-form-field appearance="outline" class="w-100">
     <mat-label>Target suite</mat-label>
@@ -110,7 +110,7 @@
           </mat-form-field>
 
           <!-- ★ Step 1.3 fields — MUST be visible here ★ -->
-          <div class="ai-grid-2">
+          <div class="ai-grid-2 stack">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Target URL (optional)</mat-label>
               <input

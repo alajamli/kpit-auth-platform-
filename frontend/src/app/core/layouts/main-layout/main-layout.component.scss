@@ -1,7 +1,8 @@
 .vex-layout {
   min-height: 100vh;
-  background: var(--vex-background);
+  background: var(--bg);
   width: 100%;
+  transition: background-color 0.25s ease;
 }
 
 .main-wrapper {
@@ -14,43 +15,32 @@
 .vex-content {
   margin-left: var(--vex-sidebar-width);
   margin-top: var(--vex-toolbar-height);
-  padding: 24px;
+  padding: 28px 32px 48px;
   min-height: calc(100vh - var(--vex-toolbar-height));
-  transition: margin-left 0.3s ease;
+  transition: margin-left 0.3s var(--ease);
   box-sizing: border-box;
+
+  /* every routed page eases in */
+  > :not(router-outlet) { display: block; animation: kpit-rise 0.4s var(--ease) both; }
 }
 
 /* Desktop : sidebar réduite */
 .sidebar-collapsed {
-  .vex-content {
-    margin-left: var(--vex-sidebar-collapsed-width);
-  }
-
-  ::ng-deep .vex-toolbar {
-    left: var(--vex-sidebar-collapsed-width) !important;
-  }
+  .vex-content { margin-left: var(--vex-sidebar-collapsed-width); }
+  ::ng-deep .vex-toolbar { left: var(--vex-sidebar-collapsed-width) !important; }
 }
 
 /* Backdrop mobile */
 .sidebar-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(2px);
+  background: rgba(7, 8, 6, 0.6);
+  backdrop-filter: blur(3px);
   z-index: 95;
+  animation: kpit-rise 0.2s ease both;
 }
 
-/* =========================================================
-   MOBILE / TABLETTE ≤ 992px
-   ========================================================= */
 @media (max-width: 992px) {
-  .vex-content {
-    margin-left: 0 !important;
-    padding: 16px;
-  }
-
-  /* Header collé à gauche sur toute la largeur */
-  ::ng-deep .vex-toolbar {
-    left: 0 !important;
-  }
+  .vex-content { margin-left: 0 !important; padding: 20px 16px 40px; }
+  ::ng-deep .vex-toolbar { left: 0 !important; }
 }

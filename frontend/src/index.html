@@ -5,14 +5,26 @@
   <title>KPIT Auth Platform</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a0b09">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
-  <!-- PRECONNECT : Force le téléchargement prioritaire des polices Material -->
+  <!-- Apply the saved / system theme before first paint (no light flash in dark mode) -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('kpit-theme');
+        var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- PRECONNECT : Force le téléchargement prioritaire des polices -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <!-- Google Fonts : Inter + Roboto + Material Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Google Fonts : Inter (UI) + Space Grotesk (titres) + JetBrains Mono (code) + Material Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=block" rel="stylesheet">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>

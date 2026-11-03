@@ -6,6 +6,7 @@ import { RouterModule, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
 import { AuthService } from '../../services/auth.service';
+import { BrandLogoComponent } from '../brand-logo/brand-logo.component';
 
 interface NavItem {
   label: string;
@@ -25,7 +26,7 @@ interface NavSection {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule, MatRippleModule],
+  imports: [CommonModule, RouterModule, MatIconModule, MatRippleModule, BrandLogoComponent],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
@@ -83,6 +84,22 @@ export class SidebarComponent {
   ];
 
   constructor(private router: Router, private authService: AuthService) {}
+
+  /* Display-only helpers for the user card (replaces the hard-coded demo user) */
+  get fullName(): string {
+    const u = this.authService.getCurrentUser();
+    return u ? `${u.first_name} ${u.last_name}`.trim() : 'Guest';
+  }
+
+  get initials(): string {
+    const u = this.authService.getCurrentUser();
+    return u ? `${u.first_name?.charAt(0) ?? ''}${u.last_name?.charAt(0) ?? ''}`.toUpperCase() || 'U' : 'G';
+  }
+
+  get roleLabel(): string {
+    const role = this.authService.getCurrentUser()?.role ?? 'viewer';
+    return role.charAt(0).toUpperCase() + role.slice(1);
+  }
 
   get filteredSections(): NavSection[] {
     const role = this.authService.getCurrentUser()?.role;

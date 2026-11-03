@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, AfterViewInit, OnDestroy, NgZone } from "@angular/core";
+import { Component, OnInit, AfterViewInit, OnDestroy, NgZone } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
   FormBuilder,
@@ -18,6 +18,8 @@ import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import {  RouterLink } from '@angular/router'; // <-- 1. Importer RouterLink
 
 import { AuthService } from "../../../core/services/auth.service";
+import { ThemeService } from "../../../core/services/theme.service";
+import { BrandLogoComponent } from "../../../core/layouts/brand-logo/brand-logo.component";
 
 declare var google: any;
 
@@ -34,6 +36,7 @@ declare var google: any;
     MatIconModule,
     MatProgressBarModule,
     MatSnackBarModule,
+    BrandLogoComponent,
     RouterLink
   ],
   templateUrl: "./login.component.html",
@@ -47,15 +50,6 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoading = false;
   hidePassword = true;
   errorMessage = "";
-
-  // Couche d’interface de la lampe
-  lampPulled = false;
-  lampLit = false;
-  lampProgress = 0;
-  private lampGrabbed = false;
-  private lampStartY = 0;
-  private readonly lampPullDistance = 112;
-  private lampRevealTimer: ReturnType<typeof setTimeout> | null = null;
 
   // Données de sécurité 2FA
   pendingLogin = "";
@@ -75,7 +69,8 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private snackBar: MatSnackBar,
-    private ngZone: NgZone // Injecté pour synchroniser le callback externe Google
+    private ngZone: NgZone, // Injecté pour synchroniser le callback externe Google
+    public theme: ThemeService
   ) {}
 
   ngOnInit(): void {
@@ -156,69 +151,6 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       });
     }
-  }
-
-  startLampPull(event: PointerEvent): void {
-    if (this.lampPulled) return;
-    this.lampGrabbed = true;
-    this.lampStartY = event.clientY;
-    (event.currentTarget as HTMLElement | null)?.setPointerCapture?.(
-      event.pointerId,
-    );
-    event.preventDefault();
-  }
-
-  @HostListener("document:pointermove", ["$event"])
-  moveLampPull(event: PointerEvent): void {
-    if (!this.lampGrabbed || this.lampPulled) return;
-
-    const distance = Math.max(0, event.clientY - this.lampStartY);
-    this.lampProgress = Math.min(distance / this.lampPullDistance, 1);
-  }
-
-  @HostListener("document:pointerup")
-  finishLampPull(): void {
-    if (!this.lampGrabbed) return;
-    this.lampGrabbed = false;
-
-    if (this.lampProgress >= 0.78) {
-      this.revealLogin();
-    } else {
-      this.lampProgress = 0;
-    }
-  }
-
-  activateLampFromKeyboard(event: KeyboardEvent): void {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      this.revealLogin();
-    }
-  }
-
-  private revealLogin(): void {
-    if (this.lampPulled) return;
-
-    this.lampProgress = 1;
-    this.lampGrabbed = false;
-    this.lampLit = true;
-
-    this.lampRevealTimer = setTimeout(() => {
-      this.lampPulled = true;
-      this.lampRevealTimer = null;
-      this.initGoogleSSO();
-    }, 360);
-  }
-
-  hideLogin(): void {
-    if (this.isLoading) return;
-    if (this.lampRevealTimer) {
-      clearTimeout(this.lampRevealTimer);
-      this.lampRevealTimer = null;
-    }
-    this.lampPulled = false;
-    this.lampLit = false;
-    this.lampProgress = 0;
-    this.lampGrabbed = false;
   }
 
   onSubmitLogin(): void {
@@ -337,6 +269,5 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopTimer();
-    if (this.lampRevealTimer) clearTimeout(this.lampRevealTimer);
   }
 }

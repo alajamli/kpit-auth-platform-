@@ -1,131 +1,18 @@
 <div class="test-management-page" [class.full-width]="viewMode === 'fullwidth'">
   
-  <!-- Page Header VEX -->
+  <!-- Page header -->
   <div class="page-header">
     <div class="header-left">
       <h1 class="page-title">Test Cases</h1>
-      <div class="breadcrumbs">
-        <mat-icon class="icon-home">home</mat-icon>
-        <span class="dot">•</span>
-        <span class="crumb" (click)="goToWelcome()">Testing</span>
-        <span class="dot">•</span>
-        <span class="crumb current">Test Cases</span>
-      </div>
-    </div>
-    
-    <div class="header-right">
-      <mat-button-toggle-group [(value)]="viewMode" class="vex-view-toggle">
-        <mat-button-toggle value="boxed">Boxed</mat-button-toggle>
-        <mat-button-toggle value="fullwidth">Full-Width</mat-button-toggle>
-      </mat-button-toggle-group>
+      <p class="page-subtitle">Create, generate with AI and run your Robot Framework tests.</p>
     </div>
   </div>
-
-  <!-- ===== AI Test Generator (Step 1.3 Generalized) ===== -->
-  <mat-card class="ai-generator-card" *ngIf="canManageTests || canRunTests">
-    <mat-card-header>
-      <div mat-card-avatar class="ai-avatar">
-        <mat-icon>auto_awesome</mat-icon>
-      </div>
-      <mat-card-title>AI Test Generator</mat-card-title>
-      <mat-card-subtitle>
-        Describe a requirement. Optionally target any URL and supply credentials or parameters.
-      </mat-card-subtitle>
-    </mat-card-header>
-
-    <mat-card-content class="ai-generator-content">
-      <!-- Functional requirement -->
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Functional requirement</mat-label>
-        <textarea
-          matInput
-          rows="2"
-          [(ngModel)]="aiRequirement"
-          name="aiRequirement"
-          placeholder="e.g. Verify login with valid credentials and redirect to dashboard"
-          [disabled]="isGenerating">
-        </textarea>
-        <mat-hint>Natural language description of the behaviour to test</mat-hint>
-      </mat-form-field>
-
-      <div class="ai-fields-row">
-        <!-- Target URL (Step 1.3) -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Target URL (optional)</mat-label>
-          <input
-            matInput
-            type="url"
-            [(ngModel)]="targetUrl"
-            name="targetUrl"
-            placeholder="https://example.com/login  or  https://api.example.com/v1"
-            [disabled]="isGenerating" />
-          <mat-icon matSuffix>link</mat-icon>
-          <mat-hint>Leave empty to test this platform. Set an external URL to generate tests against any app or API.</mat-hint>
-        </mat-form-field>
-
-        <!-- Test credentials / parameters (Step 1.3) -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Test credentials / parameters (optional)</mat-label>
-          <input
-            matInput
-            [(ngModel)]="testData"
-            name="testData"
-            placeholder='e.g. username=admin password=Secret123  or  {"email":"user@test.com"}'
-            [disabled]="isGenerating" />
-          <mat-icon matSuffix>key</mat-icon>
-          <mat-hint>Free-form credentials, headers, or JSON parameters injected into the script</mat-hint>
-        </mat-form-field>
-      </div>
-
-      <div class="ai-actions">
-        <button
-          mat-flat-button
-          class="btn-primary"
-          type="button"
-          (click)="generateTestWithAI()"
-          [disabled]="isGenerating || !aiRequirement">
-          <mat-icon *ngIf="!isGenerating">psychology</mat-icon>
-          <mat-spinner *ngIf="isGenerating" diameter="20" class="btn-spinner"></mat-spinner>
-          {{ isGenerating ? 'Generating…' : 'Generate with AI' }}
-        </button>
-
-        <button
-          mat-stroked-button
-          type="button"
-          (click)="clearAiGenerator()"
-          [disabled]="isGenerating || (!aiRequirement && !targetUrl && !testData && !generatedCode)">
-          <mat-icon>clear</mat-icon>
-          Clear
-        </button>
-      </div>
-
-      <!-- Generated code preview -->
-      <div class="generated-code-panel" *ngIf="generatedCode">
-        <div class="generated-code-header">
-          <span class="provider-chip">
-            <mat-icon>smart_toy</mat-icon>
-            Provider: {{ aiProvider | uppercase }}
-          </span>
-          <button
-            mat-flat-button
-            class="btn-primary"
-            type="button"
-            (click)="saveGeneratedTest()">
-            <mat-icon>save</mat-icon>
-            Save to suite
-          </button>
-        </div>
-        <pre class="code-block">{{ generatedCode }}</pre>
-      </div>
-    </mat-card-content>
-  </mat-card>
 
   <!-- Main Card -->
   <div class="main-card">
     
     <!-- Card Toolbar VEX -->
     <div class="card-toolbar">
-      <h2 class="toolbar-title">Test Cases</h2>
       
       <div class="search-wrapper">
         <mat-icon class="search-icon">search</mat-icon>
@@ -136,36 +23,57 @@
       </div>
       
       <span class="flex-1"></span>
+
+      <div class="tb-actions">
       
       <!-- Filtres -->
-      <button mat-icon-button 
+      <button mat-stroked-button
+              type="button"
               [matMenuTriggerFor]="filterMenu"
-              matTooltip="Filter Options"
-              class="filter-btn">
-        <mat-icon [class.filter-active]="hasActiveFilters()">filter_list</mat-icon>
+              class="tb-btn filter-trigger"
+              [class.is-active]="hasActiveFilters()"
+              matTooltip="Filter Options">
+        <mat-icon>filter_list</mat-icon>
+        <span>Filters</span>
+        <span class="filter-count" *ngIf="activeFilterCount">{{ activeFilterCount }}</span>
+      </button>
+
+      <!-- Génération IA (ADMIN et TESTER) – ouvre le même dialogue, onglet IA -->
+      <button mat-stroked-button
+              type="button"
+              *ngIf="canManageTests || canRunTests"
+              (click)="openAddTestDialog('ai')"
+              class="tb-btn ai-trigger"
+              matTooltip="Describe a requirement and let the AI write the Robot test">
+        <mat-icon>auto_awesome</mat-icon>
+        <span>Generate with AI</span>
       </button>
 
       <!-- Bouton Add (ADMIN Uniquement) -->
-      <button mat-mini-fab 
-              color="primary"
+      <button mat-stroked-button
+              type="button"
               *ngIf="canManageTests"
-              (click)="openAddTestDialog()" 
-              matTooltip="Add Test Case" 
-              class="vex-fab-add">
+              (click)="openAddTestDialog()"
+              class="tb-btn"
+              matTooltip="Add a test case manually">
         <mat-icon>add</mat-icon>
+        <span>New test</span>
       </button>
 
       <!-- Bouton Run (ADMIN et TESTER) -->
-      <button mat-flat-button 
+      <button mat-flat-button
               color="primary"
+              type="button"
               *ngIf="canRunTests"
               [matMenuTriggerFor]="runMenu"
               [disabled]="isRunning"
-              class="vex-pill-run">
+              class="tb-btn tb-run">
         <mat-icon>play_arrow</mat-icon>
         <span>Run Tests</span>
-        <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
+        <mat-icon iconPositionEnd>expand_more</mat-icon>
       </button>
+
+      </div>
 
       <!-- Menus déroulants -->
       <mat-menu #filterMenu="matMenu" class="filter-menu-panel" xPosition="before">
@@ -332,11 +240,25 @@
             </td>
           </tr>
           
-          <tr *ngIf="pagedTestCases.length === 0 && !isLoading">
-            <td colspan="9" class="empty-state">
-              <mat-icon>search_off</mat-icon>
-              <h3>No tests found</h3>
-              <p>Try adjusting your filters</p>
+          <tr *ngIf="pagedTestCases.length === 0 && !isLoading" class="empty-row">
+            <td colspan="9">
+              <div class="empty-state">
+                <div class="empty-art"><mat-icon>{{ hasActiveFilters() ? 'filter_alt_off' : 'science' }}</mat-icon></div>
+                <h3>{{ hasActiveFilters() ? 'No tests match your filters' : 'No test cases yet' }}</h3>
+                <p>{{ hasActiveFilters()
+                      ? 'Nothing matches the current search or filters. Loosen them to see more tests.'
+                      : 'Create a test manually, or describe a requirement and let the AI write it for you.' }}</p>
+                <div class="empty-actions">
+                  <button mat-stroked-button type="button" *ngIf="hasActiveFilters()" (click)="clearFilters()">
+                    <mat-icon>filter_alt_off</mat-icon><span>Clear filters</span>
+                  </button>
+                  <button mat-flat-button color="primary" type="button"
+                          *ngIf="!hasActiveFilters() && (canManageTests || canRunTests)"
+                          (click)="openAddTestDialog('ai')">
+                    <mat-icon>auto_awesome</mat-icon><span>Generate with AI</span>
+                  </button>
+                </div>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -426,7 +348,8 @@
                [class.log-fail]="log.message.includes('FAIL')"
                [class.log-info]="log.message.includes('Running')">
             <span class="log-time">{{ log.timestamp }}</span>
-            <span class="log-message">{{ log.message }}</span>
+            <mat-icon class="log-ico" [ngClass]="'k-' + logKind(log.message)">{{ logIcon(log.message) }}</mat-icon>
+            <span class="log-message">{{ logText(log.message) }}</span>
           </div>
         </div>
       </div>

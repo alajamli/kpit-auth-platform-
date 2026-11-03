@@ -2,5 +2,7 @@ venv/
 __pycache__/
 *.pyc
 .pytest_cache/
+.env
 instance/*.db
 reports/
+robot_tests/results/

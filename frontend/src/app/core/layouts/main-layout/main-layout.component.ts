@@ -1,6 +1,7 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { filter } from 'rxjs';
 
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { HeaderComponent } from '../header/header.component';
@@ -18,6 +19,13 @@ export class MainLayoutComponent {
 
   /** Largeur max = mode "tiroir mobile" */
   private readonly mobileBreakpoint = 992;
+
+  constructor(router: Router) {
+    // close the mobile drawer once a page has been picked
+    router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe(() => (this.isMobileMenuOpen = false));
+  }
 
   toggleMenu(): void {
     if (window.innerWidth <= this.mobileBreakpoint) {

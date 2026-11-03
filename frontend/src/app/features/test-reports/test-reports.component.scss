@@ -1,122 +1,39 @@
-.page-container {
-  padding: 24px;
-  background-color: var(--kpit-bg, #f8fafc);
-  min-height: 100%;
-}
+.page-header { align-items: center; }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 24px;
-}
-
-.page-title {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 700;
-  color: #1e293b;
-}
-
-.page-subtitle {
-  margin: 4px 0 0;
-  color: #64748b;
-  font-size: 14px;
-}
-
-.content-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.vex-table {
-  width: 100%;
-}
-
-/* Styling for the Job ID column */
 .folder-chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  background: #f1f5f9;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #334155;
-  font-family: ui-monospace, monospace;
-
-  .folder-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-    color: #94a3b8;
-  }
-}
-
-.folder-root {
-  background: #eef2ff;
-  color: var(--kpit-primary, #3730a3);
-
-  .folder-icon {
-    color: var(--kpit-primary, #3730a3);
-  }
-}
-
-/* Actions Column styling */
-.actions-header {
-  text-align: right;
-  padding-right: 24px !important;
-}
-
-.actions-cell {
-  text-align: right;
-  padding-right: 24px !important;
+  gap: 8px;
+  padding: 5px 12px 5px 8px;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+
+  .folder-icon { width: 18px; height: 18px; font-size: 18px; color: var(--text-3); }
+
+  &.folder-root {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    .folder-icon { color: var(--accent-text); }
+  }
 }
 
-.action-btn {
-  border-radius: 8px;
+.actions-header, .actions-cell { text-align: right; white-space: nowrap; }
+.actions-cell .action-btn {
+  height: 36px;
+  min-height: 36px !important;
   margin-left: 8px;
-  
-  mat-icon {
-    margin-right: 4px;
-  }
+  padding: 0 14px;
+  font-size: 12.5px;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; margin-right: 4px; }
 }
 
-.log-btn {
-  border-color: #cbd5e1;
-  color: #475569;
-}
-
-/* Empty State & Loading */
-.empty-state, .loading-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 64px 24px;
-  color: #64748b;
-
-  mat-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-    color: #cbd5e1;
-  }
-
-  p {
-    margin: 0;
-    font-size: 15px;
-  }
-}
-.action-btn mat-icon {
-  margin-right: 4px;
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
+@media (max-width: 900px) {
+  .content-card { overflow-x: auto; }
 }

@@ -1,69 +1,175 @@
 <div class="welcome-page" *ngIf="user">
-  
-  <div class="page-header">
-    <div class="header-left">
-      <h1 class="page-title">Dashboards</h1>
-      <div class="breadcrumbs">
-        <mat-icon class="icon-home">home</mat-icon>
-        <span class="dot">•</span>
-        <span class="crumb">Dashboards</span>
-        <span class="dot">•</span>
-        <span class="crumb current">Overview</span>
-      </div>
-    </div>
-  </div>
 
   <div class="dashboard-grid">
-    
-    <!-- LIGNE 1 : BANNIÈRE + VRAIS KPIS -->
-    <div class="dashboard-top-row">
-      
-      <!-- Bannière -->
-      <div class="vex-card banner-card">
-  <div class="banner-content">
-    <div class="banner-text">
-      <h2 class="banner-title">Welcome back, {{ user.first_name }}!</h2>
-      <p class="banner-subtitle">
-        You are logged in as <strong>{{ user.role | uppercase }}</strong>. Your testing environment is synchronized.
-      </p>
-    </div>
-    <div class="banner-actions">
-      <button mat-flat-button class="btn-vex-white" (click)="goToTestManagement()">
-        <span>Manage Tests</span>
-        <mat-icon>arrow_forward</mat-icon>
-      </button>
-    </div>
-  </div>
-</div>
 
-      <!-- KPI 1 : VRAI Total Tests -->
-      <div class="vex-card kpi-card">
-        <div class="kpi-header">
-          <div class="kpi-value" *ngIf="!isLoadingStats">{{ totalTests }}</div>
-          <mat-spinner diameter="24" *ngIf="isLoadingStats"></mat-spinner>
-          <div class="kpi-icon-box icon-indigo">
-            <mat-icon>fact_check</mat-icon>
+    <!-- ================= HERO ================= -->
+    <section class="vex-card banner-card">
+      <div class="banner-orb" aria-hidden="true"></div>
+      <div class="banner-grid" aria-hidden="true"></div>
+
+      <div class="banner-content">
+        <div class="banner-text">
+          <span class="banner-eyebrow"><span class="live-dot"></span> Environment synchronized &middot; {{ loginTime | date:'EEEE, MMM d' }}</span>
+          <h2 class="banner-title">{{ greeting }}, <span class="hl">{{ user.first_name }}</span>!</h2>
+          <p class="banner-subtitle">
+            Welcome back, {{ user.first_name }}! You are logged in as <strong>{{ user.role | uppercase }}</strong>.
+            Your testing environment is synchronized.
+          </p>
+          <div class="banner-actions">
+            <button mat-flat-button class="btn-vex-white" (click)="goToTestManagement()">
+              <span>Manage Tests</span>
+              <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+            </button>
+            <button mat-stroked-button class="btn-ghost" (click)="goToHistory()">
+              <mat-icon>history</mat-icon>
+              <span>Run history</span>
+            </button>
           </div>
         </div>
-        <div class="kpi-label">Total Test Cases</div>
-      </div>
 
-      <!-- KPI 2 : VRAI Total Suites -->
-      <div class="vex-card kpi-card">
-        <div class="kpi-header">
-          <div class="kpi-value" *ngIf="!isLoadingStats">{{ totalSuites }}</div>
-          <mat-spinner diameter="24" *ngIf="isLoadingStats"></mat-spinner>
-          <div class="kpi-icon-box icon-amber">
-            <mat-icon>folder_open</mat-icon>
+        <!-- Hero mini-stats -->
+        <div class="banner-stats">
+          <div class="b-stat">
+            <span class="b-val">{{ shownTests }}</span>
+            <span class="b-lbl">test cases</span>
+          </div>
+          <div class="b-stat">
+            <span class="b-val">{{ hasRuns ? lastRunRate + '%' : '—' }}</span>
+            <span class="b-lbl">last run passed</span>
+          </div>
+          <div class="b-stat">
+            <span class="b-val">{{ riskLabel }}</span>
+            <span class="b-lbl">session risk</span>
           </div>
         </div>
-        <div class="kpi-label">Test Suites Files</div>
+      </div>
+    </section>
+
+    <!-- ================= KPIs ================= -->
+    <section class="kpi-row">
+      <div class="vex-card kpi-card">
+        <div class="kpi-icon-box tone-lime"><mat-icon>fact_check</mat-icon></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Total Test Cases</div>
+          <div class="kpi-value" *ngIf="!isLoadingStats">{{ shownTests }}</div>
+          <mat-spinner diameter="24" *ngIf="isLoadingStats"></mat-spinner>
+        </div>
+        <div class="kpi-foot">across {{ totalSuites }} suites</div>
       </div>
 
-    </div>
+      <div class="vex-card kpi-card">
+        <div class="kpi-icon-box tone-sky"><mat-icon>folder_open</mat-icon></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Test Suites Files</div>
+          <div class="kpi-value" *ngIf="!isLoadingStats">{{ shownSuites }}</div>
+          <mat-spinner diameter="24" *ngIf="isLoadingStats"></mat-spinner>
+        </div>
+        <div class="kpi-foot">Robot Framework files</div>
+      </div>
 
-       <!-- LIGNE 2 : WIDGET SÉCURITÉ IA (LAYER 2) -->
-    <div class="dashboard-middle-row">
+      <div class="vex-card kpi-card">
+        <div class="kpi-icon-box tone-violet"><mat-icon>sell</mat-icon></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Tags in use</div>
+          <div class="kpi-value" *ngIf="!isLoadingStats">{{ shownTags }}</div>
+          <mat-spinner diameter="24" *ngIf="isLoadingStats"></mat-spinner>
+        </div>
+        <div class="kpi-foot">to slice your runs</div>
+      </div>
+
+      <div class="vex-card kpi-card">
+        <div class="kpi-icon-box tone-green"><mat-icon>verified</mat-icon></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Overall pass rate</div>
+          <div class="kpi-value" *ngIf="!isLoadingStats">{{ hasRuns ? shownRate + '%' : '—' }}</div>
+          <mat-spinner diameter="24" *ngIf="isLoadingStats"></mat-spinner>
+        </div>
+        <div class="kpi-foot">{{ totalRuns }} run{{ totalRuns === 1 ? '' : 's' }} recorded</div>
+      </div>
+    </section>
+
+    <!-- ================= TREND + DONUT ================= -->
+    <section class="two-col wide-left">
+      <div class="vex-card chart-card">
+        <div class="card-header">
+          <h3><mat-icon>bar_chart</mat-icon> Execution trend</h3>
+          <span class="legend"><i class="lg pass"></i>Passed <i class="lg fail"></i>Failed</span>
+        </div>
+
+        <div class="chart-wrap" *ngIf="chartBars.length; else noChart">
+          <svg viewBox="0 0 600 180" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Passed and failed tests of the last runs">
+            <line class="grid" x1="0" x2="600" [attr.y1]="chartHeight" [attr.y2]="chartHeight"></line>
+            <line class="grid dashed" x1="0" x2="600" [attr.y1]="chartHeight / 2" [attr.y2]="chartHeight / 2"></line>
+            <line class="grid dashed" x1="0" x2="600" y1="0" y2="0"></line>
+            <g *ngFor="let b of chartBars" class="bar-group">
+              <title>{{ b.tip }}</title>
+              <rect class="bar bar-pass" [attr.x]="b.x" [attr.y]="b.passY" [attr.width]="b.w" [attr.height]="b.passH" rx="6"></rect>
+              <rect *ngIf="b.failH" class="bar bar-fail" [attr.x]="b.x" [attr.y]="b.failY" [attr.width]="b.w" [attr.height]="b.failH" rx="6"></rect>
+              <text class="bar-label" [attr.x]="b.x + b.w / 2" y="172" text-anchor="middle">{{ b.label }}</text>
+            </g>
+          </svg>
+        </div>
+        <ng-template #noChart>
+          <div class="empty-state small">
+            <mat-icon>show_chart</mat-icon>
+            <p>No finished runs yet. Run tests from <a (click)="goToTestManagement()">Test Cases</a> and the trend will appear here.</p>
+          </div>
+        </ng-template>
+      </div>
+
+      <div class="vex-card donut-card">
+        <div class="card-header"><h3><mat-icon>donut_large</mat-icon> Quality</h3></div>
+        <div class="donut-body">
+          <div class="donut">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+              <circle class="ring-fg" cx="60" cy="60" r="52" [attr.stroke-dasharray]="donutDash"></circle>
+            </svg>
+            <div class="donut-center">
+              <span class="d-val">{{ hasRuns ? passRate : '—' }}<small *ngIf="hasRuns">%</small></span>
+              <span class="d-lbl">passed</span>
+            </div>
+          </div>
+          <ul class="donut-list">
+            <li><span class="sw tone-pass"></span>Last run <b>{{ hasRuns ? lastRunRate + '%' : '—' }}</b></li>
+            <li><span class="sw tone-info"></span>Runs recorded <b>{{ totalRuns }}</b></li>
+            <li><span class="sw tone-tag"></span>Test cases <b>{{ totalTests }}</b></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= RECENT RUNS + AI SECURITY ================= -->
+    <section class="two-col">
+      <div class="vex-card runs-card">
+        <div class="card-header">
+          <h3><mat-icon>history</mat-icon> Recent runs</h3>
+          <button class="link-btn" type="button" (click)="goToHistory()">View all</button>
+        </div>
+        <ul class="run-list" *ngIf="recentRuns.length; else noRuns">
+          <li class="run-item" *ngFor="let r of recentRuns">
+            <span class="run-dot" [ngClass]="'status-' + r.status"></span>
+            <div class="run-main">
+              <span class="run-when">{{ r.started_at | date:'MMM d, h:mm a' }}</span>
+              <span class="run-id">{{ r.id | slice:0:8 }}</span>
+            </div>
+            <div class="run-bar" *ngIf="r.total">
+              <span class="run-bar-pass" [style.width.%]="(r.passed / r.total) * 100"></span>
+              <span class="run-bar-fail" [style.width.%]="(r.failed / r.total) * 100"></span>
+            </div>
+            <span class="run-score">{{ r.passed }}/{{ r.total }}</span>
+            <span class="status-chip" [ngClass]="'status-' + r.status">{{ r.status }}</span>
+          </li>
+        </ul>
+        <ng-template #noRuns>
+          <div class="empty-state small">
+            <mat-icon>play_circle</mat-icon>
+            <p>Nothing has been executed yet.</p>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- AI security (LAYER 2) -->
       <div class="vex-card ai-security-card" [class.warning-border]="isAnomaly">
         <div class="card-header">
           <h3>
@@ -74,108 +180,123 @@
             {{ isAnomaly ? 'HIGH RISK DETECTED' : 'NORMAL BEHAVIOR' }}
           </span>
         </div>
-        
-        <div class="chart-content" style="padding: 20px 24px;">
+
+        <div class="chart-content">
+          <div class="arc-gauge" [class.gauge-danger]="isAnomaly">
+            <svg viewBox="0 0 180 104" aria-hidden="true">
+              <path class="arc-bg" d="M10 94 A80 80 0 0 1 170 94" pathLength="251.3"></path>
+              <path class="arc-fg" d="M10 94 A80 80 0 0 1 170 94"
+                    [attr.stroke-dasharray]="gaugeLength" [attr.stroke-dashoffset]="gaugeOffset"></path>
+            </svg>
+            <div class="arc-center">
+              <span class="arc-num">{{ (anomalyScore * 100) | number:'1.0-0' }}<small>%</small></span>
+              <span class="arc-lbl">{{ riskLabel }} risk</span>
+            </div>
+          </div>
+
           <div class="real-stats-container">
-            
-            <!-- Risque Calculé par l'IA -->
             <div class="stat-block" [class.block-danger]="isAnomaly">
-              <mat-icon [color]="isAnomaly ? 'warn' : 'primary'">security</mat-icon>
+              <div class="stat-ico"><mat-icon>security</mat-icon></div>
               <div class="text">
                 <span class="val">{{ (anomalyScore * 100) | number:'1.0-0' }}% Anomaly Risk</span>
                 <span class="lbl">Calculated by Isolation Forest ML</span>
               </div>
             </div>
-            
-            <!-- Moteur de Détection -->
             <div class="stat-block">
-              <mat-icon color="accent">memory</mat-icon>
+              <div class="stat-ico"><mat-icon>memory</mat-icon></div>
               <div class="text">
                 <span class="val">Scikit-Learn ML Engine</span>
                 <span class="lbl">Real-time Batch Training</span>
               </div>
             </div>
-
-            <!-- Statut de la Session -->
             <div class="stat-block">
-              <mat-icon color="primary">verified_user</mat-icon>
+              <div class="stat-ico"><mat-icon>verified_user</mat-icon></div>
               <div class="text">
                 <span class="val">Multi-Factor Analysis</span>
-                <span class="lbl">Time, Frequency & IP Evaluated</span>
+                <span class="lbl">Time, Frequency &amp; IP Evaluated</span>
               </div>
             </div>
-
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- LIGNE 3 : PROFIL & ACTIONS (Inchangé) -->
-    <div class="dashboard-bottom-row">
-      
-      <!-- Session -->
-      <div class="vex-card info-card">
-        <div class="card-header">
-          <h3>Current Session</h3>
-        </div>
-        <div class="info-list">
-          <div class="info-item">
-            <div class="info-icon"><mat-icon>person_outline</mat-icon></div>
-            <div class="info-text">
-              <span class="label">Username</span>
-              <span class="value">{{ user.login }}</span>
-            </div>
-          </div>
-          <div class="info-item">
-            <div class="info-icon"><mat-icon>mail_outline</mat-icon></div>
-            <div class="info-text">
-              <span class="label">Email</span>
-              <span class="value">{{ user.email }}</span>
-            </div>
-          </div>
-          <div class="info-item">
-            <div class="info-icon"><mat-icon>schedule</mat-icon></div>
-            <div class="info-text">
-              <span class="label">Login Time</span>
-              <span class="value">{{ loginTime | date:'MMM d, y, h:mm a' }}</span>
-            </div>
+    <!-- ================= COVERAGE + ACTIONS ================= -->
+    <section class="two-col wide-left">
+      <div class="vex-card coverage-card">
+        <div class="card-header"><h3><mat-icon>account_tree</mat-icon> Coverage by suite</h3></div>
+        <div class="coverage-body">
+          <ul class="suite-list" *ngIf="suiteStats.length; else noSuites">
+            <li *ngFor="let s of suiteStats">
+              <div class="suite-row">
+                <span class="suite-name">{{ s.name }}</span>
+                <span class="suite-count">{{ s.count }} test{{ s.count === 1 ? '' : 's' }}</span>
+              </div>
+              <div class="suite-track"><span class="suite-fill" [style.width.%]="s.pct"></span></div>
+            </li>
+          </ul>
+          <ng-template #noSuites>
+            <div class="empty-state small"><mat-icon>folder_off</mat-icon><p>No test suites found.</p></div>
+          </ng-template>
+
+          <div class="tag-cloud" *ngIf="tagStats.length">
+            <span class="tag-title">Top tags</span>
+            <span class="tag-pill" *ngFor="let t of tagStats" [ngClass]="'w' + t.weight">
+              {{ t.tag }} <b>{{ t.count }}</b>
+            </span>
           </div>
         </div>
       </div>
 
-      <!-- Quick Actions -->
-      <div class="vex-card actions-card">
-        <div class="card-header">
-          <h3>Quick Actions</h3>
+      <div class="side-stack">
+        <div class="vex-card actions-card">
+          <div class="card-header"><h3>Quick Actions</h3></div>
+          <div class="action-list">
+            <div class="action-item" (click)="goToTestManagement()">
+              <div class="action-icon bg-indigo"><mat-icon>fact_check</mat-icon></div>
+              <div class="action-text">
+                <strong>Manage Test Cases</strong>
+                <span>Create, edit, and run your automated tests</span>
+              </div>
+              <mat-icon class="arrow">chevron_right</mat-icon>
+            </div>
+            <div class="action-item" (click)="goToReports()">
+              <div class="action-icon bg-teal"><mat-icon>assessment</mat-icon></div>
+              <div class="action-text">
+                <strong>View Reports</strong>
+                <span>Analyze the latest test execution results</span>
+              </div>
+              <mat-icon class="arrow">chevron_right</mat-icon>
+            </div>
+            <div class="action-item action-logout" (click)="onLogout()">
+              <div class="action-icon bg-red"><mat-icon>logout</mat-icon></div>
+              <div class="action-text">
+                <strong class="text-red">Sign Out</strong>
+                <span>Securely end your current session</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="action-list">
-          <div class="action-item" (click)="goToTestManagement()">
-            <div class="action-icon bg-indigo"><mat-icon>fact_check</mat-icon></div>
-            <div class="action-text">
-              <strong>Manage Test Cases</strong>
-              <span>Create, edit, and run your automated tests</span>
+
+        <div class="vex-card info-card">
+          <div class="card-header"><h3>Current Session</h3></div>
+          <div class="info-list">
+            <div class="info-item">
+              <div class="info-icon"><mat-icon>person_outline</mat-icon></div>
+              <div class="info-text"><span class="label">Username</span><span class="value">{{ user.login }}</span></div>
             </div>
-            <mat-icon class="arrow">chevron_right</mat-icon>
-          </div>
-          
-          <div class="action-item">
-            <div class="action-icon bg-teal"><mat-icon>assessment</mat-icon></div>
-            <div class="action-text">
-              <strong>View Reports</strong>
-              <span>Analyze the latest test execution results</span>
+            <div class="info-item">
+              <div class="info-icon"><mat-icon>mail_outline</mat-icon></div>
+              <div class="info-text"><span class="label">Email</span><span class="value">{{ user.email }}</span></div>
             </div>
-            <mat-icon class="arrow">chevron_right</mat-icon>
-          </div>
-          
-          <div class="action-item action-logout" (click)="onLogout()">
-            <div class="action-icon bg-red"><mat-icon>logout</mat-icon></div>
-            <div class="action-text">
-              <strong class="text-red">Sign Out</strong>
-              <span>Securely end your current session</span>
+            <div class="info-item">
+              <div class="info-icon"><mat-icon>schedule</mat-icon></div>
+              <div class="info-text"><span class="label">Login Time</span><span class="value">{{ loginTime | date:'MMM d, y, h:mm a' }}</span></div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
+
   </div>
 </div>

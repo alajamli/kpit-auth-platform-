@@ -30,6 +30,11 @@ class AsyncRobotRunner:
             self.venv_python = self.robot_tests_dir / 'venv' / 'Scripts' / 'python.exe'
         else:
             self.venv_python = self.robot_tests_dir / 'venv' / 'bin' / 'python'
+
+        # Docker / no dedicated venv: fall back to the interpreter running the backend
+        # (robotframework is installed in it via requirements.txt).
+        if not self.venv_python.exists():
+            self.venv_python = Path(sys.executable)
             
         self.jobs: Dict[str, Dict] = {}
         self.processes: Dict[str, subprocess.Popen] = {}  # Pour garder la trace des processus à annuler

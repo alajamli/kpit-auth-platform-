@@ -1,58 +1,132 @@
-<div class="page-container">
+<div class="page-container settings-page">
   <div class="page-header">
-    <h1 class="page-title">Platform Settings</h1>
-    <p class="page-subtitle">User profile details and application preferences</p>
+    <div>
+      <h1 class="page-title">Platform Settings</h1>
+      <p class="page-subtitle">User profile details and application preferences</p>
+    </div>
   </div>
 
-  <div class="settings-grid">
-    <!-- User Profile Card -->
-    <div class="content-card">
-      <div class="card-header">
-        <mat-icon>person</mat-icon>
-        <h3>Profile Information</h3>
-      </div>
-      <div class="card-body">
-        <div class="info-row">
-          <span class="label">Full Name:</span>
-          <span class="value">{{ currentUser?.first_name || 'Khammar' }} {{ currentUser?.last_name || 'Mohamed' }}</span>
-        </div>
-        <div class="info-row">
-          <span class="label">Email:</span>
-          <span class="value">{{ currentUser?.email || 'mohamed.khammar@kpit.com' }}</span>
-        </div>
-        <div class="info-row">
-          <span class="label">Role:</span>
-          <span class="role-badge">{{ currentUser?.role || 'admin' }}</span>
-        </div>
-      </div>
-    </div>
+  <div class="settings-layout">
 
-    <!-- UI Preferences Card -->
-    <div class="content-card">
-      <div class="card-header">
-        <mat-icon>tune</mat-icon>
-        <h3>Preferences</h3>
-      </div>
-      <div class="card-body">
-        <div class="toggle-row">
-          <div>
-            <div class="toggle-title">Auto-expand execution logs</div>
-            <div class="toggle-desc">Show full real-time logs in test overlay</div>
+    <!-- ============ LEFT : who you are ============ -->
+    <aside class="settings-side">
+
+      <div class="content-card profile-card">
+        <div class="profile-hero">
+          <div class="profile-avatar">{{ initials }}</div>
+          <div class="profile-id">
+            <h2>{{ currentUser?.first_name }} {{ currentUser?.last_name }}</h2>
+            <span class="role-badge">{{ currentUser?.role || 'viewer' }}</span>
           </div>
-          <mat-slide-toggle [(ngModel)]="autoExpandLogs" color="primary"></mat-slide-toggle>
         </div>
+        <div class="card-body">
+          <div class="info-row">
+            <span class="label"><mat-icon>mail_outline</mat-icon>Email</span>
+            <span class="value">{{ currentUser?.email || '—' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label"><mat-icon>alternate_email</mat-icon>Username</span>
+            <span class="value mono">{{ currentUser?.login ? '@' + currentUser.login : '—' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label"><mat-icon>shield</mat-icon>Role</span>
+            <span class="value capitalize">{{ currentUser?.role || '—' }}</span>
+          </div>
+        </div>
+      </div>
 
-        <div class="action-row">
-          <button mat-stroked-button color="warn" (click)="clearLocalStorage()">
-            <mat-icon>delete_sweep</mat-icon>
-            Clear Local Cache
-          </button>
+      <div class="content-card">
+        <div class="card-header">
+          <mat-icon>verified_user</mat-icon>
+          <h3>What your role can do</h3>
+        </div>
+        <ul class="perm-list">
+          <li *ngFor="let p of permissions" [class.denied]="!p.allowed">
+            <span class="perm-ico"><mat-icon>{{ p.allowed ? 'check' : 'lock' }}</mat-icon></span>
+            <span class="perm-text">{{ p.label }}</span>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- ============ RIGHT : how the app behaves ============ -->
+    <div class="settings-main">
+
+      <section class="content-card">
+        <div class="card-header">
+          <mat-icon>palette</mat-icon>
+          <div class="head-text">
+            <h3>Appearance</h3>
+            <p>Choose how KPIT looks on this device.</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="theme-picker" role="radiogroup" aria-label="Theme">
+            <button type="button" class="theme-option" role="radio"
+                    [class.selected]="!theme.isDark" [attr.aria-checked]="!theme.isDark"
+                    (click)="setTheme(false)">
+              <span class="theme-preview light"><i></i><i></i><i></i></span>
+              <span class="theme-name"><mat-icon>light_mode</mat-icon> Light</span>
+              <span class="theme-tick" *ngIf="!theme.isDark"><mat-icon>check</mat-icon></span>
+            </button>
+            <button type="button" class="theme-option" role="radio"
+                    [class.selected]="theme.isDark" [attr.aria-checked]="theme.isDark"
+                    (click)="setTheme(true)">
+              <span class="theme-preview dark"><i></i><i></i><i></i></span>
+              <span class="theme-name"><mat-icon>dark_mode</mat-icon> Dark</span>
+              <span class="theme-tick" *ngIf="theme.isDark"><mat-icon>check</mat-icon></span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-card">
+        <div class="card-header">
+          <mat-icon>tune</mat-icon>
+          <div class="head-text">
+            <h3>Preferences</h3>
+            <p>Test execution and logging behaviour.</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="toggle-row">
+            <div class="toggle-text">
+              <div class="toggle-title">Auto-expand execution logs</div>
+              <div class="toggle-desc">Show full real-time logs in test overlay</div>
+            </div>
+            <mat-slide-toggle [(ngModel)]="autoExpandLogs" color="primary"></mat-slide-toggle>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="footer-hint">Changes apply to this browser.</span>
           <button mat-flat-button color="primary" (click)="savePreferences()">
             <mat-icon>save</mat-icon>
-            Save Changes
+            <span>Save changes</span>
           </button>
         </div>
-      </div>
+      </section>
+
+      <section class="content-card danger-card">
+        <div class="card-header">
+          <mat-icon>storage</mat-icon>
+          <div class="head-text">
+            <h3>Data &amp; storage</h3>
+            <p>Everything this app keeps in your browser.</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="danger-row">
+            <div class="toggle-text">
+              <div class="toggle-title">Clear local cache</div>
+              <div class="toggle-desc">Removes saved preferences, notifications and your sign-in. You will have to log in again.</div>
+            </div>
+            <button mat-stroked-button color="warn" (click)="clearLocalStorage()">
+              <mat-icon>delete_sweep</mat-icon>
+              <span>Clear cache</span>
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 </div>
